@@ -6,6 +6,7 @@
 package schemeinterpreter.parser;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import schemeinterpreter.SchemeInterpreterException;
 import schemeinterpreter.lexer.Lexer;
@@ -29,16 +30,19 @@ public class Parser {
     }
     
     public Symbol parse() throws IOException, SchemeInterpreterException,
-                                 InstantiationException, IllegalAccessException
+                                 InstantiationException, IllegalAccessException,
+                                 NoSuchMethodException, InvocationTargetException
     {
         return parse(Symbol.getStartSymbol());
     }
     
     private Symbol parse(Symbol currSymbol) 
             throws IOException, SchemeInterpreterException, 
-                   InstantiationException, IllegalAccessException
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
     {
         Token currToken = lexer.peek();
+        currSymbol.acceptToken(currToken);
         
         Class<? extends Symbol> symType = currSymbol.getClass();
         Class<? extends Token> tokenType = currToken.getClass();
@@ -53,7 +57,6 @@ public class Parser {
         }
         
         if (currSymbol.isTerminal()) {
-            currSymbol.acceptToken(currToken);
             lexer.next();
         }
 

@@ -5,11 +5,16 @@
  */
 package schemeinterpreter.parser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import static java.util.stream.Collectors.joining;
 import schemeinterpreter.SchemeInterpreterException;
 import schemeinterpreter.lexer.Token;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -20,142 +25,75 @@ public class PredictTable {
     private final Map<Class<? extends Symbol>, 
                   Map<Class<? extends Token>, ReplacementRule>> table;
     
-    private PredictTable(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        this.table = table;
+    private PredictTable() {
+        this.table = new HashMap<>();
+        
+        addSEntries();
+        addExprsEntries();
+        addExprEntries();
+        addListEntries();
+        addListExprsEntries();
+        addTerminalEntries();
     }
     
     public static PredictTable makeTable() {
-        Map<Class<? extends Symbol>,
-        Map<Class<? extends Token>, ReplacementRule>> table = new HashMap<>();
-        
-        addEntries(table);
-        
-        return new PredictTable(table);
+        return new PredictTable();
     }
     
-    private static void addEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        addSEntries(table);
-        addExprsEntries(table);
-        addExprEntries(table);
-        addListEntries(table);
-        addListExprEntries(table);
-        addTerminalEntries(table);
-    }
-    
-    private static void addSEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> entry = new HashMap<>();
-        table.put(Symbol.S.class, entry);
-        
-        entry.put(Token.EOF.class, ReplacementRule.S_TO_EXPRS_EOF);
-        entry.put(Token.Quote.class, ReplacementRule.S_TO_EXPRS_EOF);
-        entry.put(Token.Identifier.class, ReplacementRule.S_TO_EXPRS_EOF);
-        entry.put(Token.Integer.class, ReplacementRule.S_TO_EXPRS_EOF);
-        entry.put(Token.String.class, ReplacementRule.S_TO_EXPRS_EOF);
-        entry.put(Token.Lparen.class, ReplacementRule.S_TO_EXPRS_EOF);
+    private void addSEntries() {
+        addEntry(Symbol.S.class, Token.EOF.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.Quote.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.Identifier.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.Integer.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.String.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.Lparen.class, ReplacementRule.S_TO_EXPRS_EOF);
     }
 
-    private static void addExprsEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> entry = new HashMap<>();
-        table.put(Symbol.Exprs.class, entry);
+    private void addExprsEntries() {        
+        addEntry(Symbol.Exprs.class, Token.EOF.class, ReplacementRule.EXPRS_TO_EPSILON);
+        addEntry(Symbol.Exprs.class, Token.Rparen.class, ReplacementRule.EXPRS_TO_EPSILON);
         
-        entry.put(Token.EOF.class, ReplacementRule.EXPRS_TO_EPSILON);
-        entry.put(Token.Rparen.class, ReplacementRule.EXPRS_TO_EPSILON);
-        
-        entry.put(Token.Quote.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
-        entry.put(Token.Identifier.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
-        entry.put(Token.Integer.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
-        entry.put(Token.String.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
-        entry.put(Token.Lparen.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.Quote.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.Identifier.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.Integer.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.String.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.Lparen.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
     }
 
-    private static void addExprEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> entry = new HashMap<>();
-        table.put(Symbol.Expr.class, entry);
-        
-        entry.put(Token.Quote.class, ReplacementRule.EXPR_TO_QUOTE_EXPR);
-        entry.put(Token.Lparen.class, ReplacementRule.EXPR_TO_LIST);
-        entry.put(Token.Identifier.class, ReplacementRule.EXPR_TO_IDENTIFIER);
-        entry.put(Token.Integer.class, ReplacementRule.EXPR_TO_INTEGER);
-        entry.put(Token.String.class, ReplacementRule.EXPR_TO_STRING);
+    private void addExprEntries() {        
+        addEntry(Symbol.Expr.class, Token.Quote.class, ReplacementRule.EXPR_TO_QUOTE_EXPR);
+        addEntry(Symbol.Expr.class, Token.Lparen.class, ReplacementRule.EXPR_TO_LIST);
+        addEntry(Symbol.Expr.class, Token.Identifier.class, ReplacementRule.EXPR_TO_IDENTIFIER);
+        addEntry(Symbol.Expr.class, Token.Integer.class, ReplacementRule.EXPR_TO_INTEGER);
+        addEntry(Symbol.Expr.class, Token.String.class, ReplacementRule.EXPR_TO_STRING);
     }
 
-    private static void addListEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> entry = new HashMap<>();
-        table.put(Symbol.List.class, entry);
-        
-        entry.put(Token.Lparen.class, ReplacementRule.LIST_TO_LPAREN_LISTEXPRS_RPAREN);
+    private void addListEntries() {
+        addEntry(Symbol.List.class, Token.Lparen.class, ReplacementRule.LIST_TO_LPAREN_LISTEXPRS_RPAREN);
     }
     
-    private static void addListExprEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> entry = new HashMap<>();
-        table.put(Symbol.ListExprs.class, entry);
-        
-        entry.put(Token.EOF.class, ReplacementRule.LISTEXPR_TO_EXPRS);
-        entry.put(Token.Rparen.class, ReplacementRule.LISTEXPR_TO_EXPRS);        
-        entry.put(Token.Quote.class, ReplacementRule.LISTEXPR_TO_EXPRS);
-        entry.put(Token.Identifier.class, ReplacementRule.LISTEXPR_TO_EXPRS);
-        entry.put(Token.Integer.class, ReplacementRule.LISTEXPR_TO_EXPRS);
-        entry.put(Token.String.class, ReplacementRule.LISTEXPR_TO_EXPRS);
-        entry.put(Token.Lparen.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+    private void addListExprsEntries() {
+        addEntry(Symbol.ListExprs.class, Token.Lparen.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+        addEntry(Symbol.ListExprs.class, Token.Rparen.class, ReplacementRule.LISTEXPR_TO_EXPRS);        
+        addEntry(Symbol.ListExprs.class, Token.Quote.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+        addEntry(Symbol.ListExprs.class, Token.Identifier.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+        addEntry(Symbol.ListExprs.class, Token.Integer.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+        addEntry(Symbol.ListExprs.class, Token.String.class, ReplacementRule.LISTEXPR_TO_EXPRS);
     }
     
-    private static void addTerminalEntries(
-            Map<Class<? extends Symbol>, 
-            Map<Class<? extends Token>, ReplacementRule>> table)
-    {
-        Map<Class<? extends Token>, ReplacementRule> lparenEntry = new HashMap<>();
-        table.put(Symbol.Lparen.class, lparenEntry);
-        lparenEntry.put(Token.Lparen.class, ReplacementRule.LPAREN_TO_EPSILON);
-        
-        Map<Class<? extends Token>, ReplacementRule> rparenEntry = new HashMap<>();
-        table.put(Symbol.Rparen.class, rparenEntry);
-        rparenEntry.put(Token.Rparen.class, ReplacementRule.RPAREN_TO_EPSILON);
-        
-        Map<Class<? extends Token>, ReplacementRule> quoteEntry = new HashMap<>();
-        table.put(Symbol.Quote.class, quoteEntry);
-        quoteEntry.put(Token.Quote.class, ReplacementRule.QUOTE_TO_EPSILON);
-        
-        Map<Class<? extends Token>, ReplacementRule> integerEntry = new HashMap<>();
-        table.put(Symbol.Integer.class, integerEntry);
-        integerEntry.put(Token.Integer.class, ReplacementRule.INTEGER_TO_EPSILON);
-        
-        Map<Class<? extends Token>, ReplacementRule> identifierEntry = new HashMap<>();
-        table.put(Symbol.Identifier.class, identifierEntry);
-        identifierEntry.put(Token.Identifier.class, ReplacementRule.IDENTIFIER_TO_EPSILON);
-        
-        Map<Class<? extends Token>, ReplacementRule> stringEntry = new HashMap<>();
-        table.put(Symbol.String.class, stringEntry);
-        stringEntry.put(Token.String.class, ReplacementRule.STRING_TO_EPSILON);
-
-        Map<Class<? extends Token>, ReplacementRule> eofEntry = new HashMap<>();
-        table.put(Symbol.EOF.class, eofEntry);
-        eofEntry.put(Token.EOF.class, ReplacementRule.EOF_TO_EPSILON);
+    private void addTerminalEntries() {
+        addEntry(Symbol.Lparen.class, Token.Lparen.class, ReplacementRule.LPAREN_TO_EPSILON);
+        addEntry(Symbol.Rparen.class, Token.Rparen.class, ReplacementRule.RPAREN_TO_EPSILON);
+        addEntry(Symbol.Quote.class, Token.Quote.class, ReplacementRule.QUOTE_TO_EPSILON);
+        addEntry(Symbol.Integer.class, Token.Integer.class, ReplacementRule.INTEGER_TO_EPSILON);
+        addEntry(Symbol.Identifier.class, Token.Identifier.class, ReplacementRule.IDENTIFIER_TO_EPSILON);
+        addEntry(Symbol.String.class, Token.String.class, ReplacementRule.STRING_TO_EPSILON);
+        addEntry(Symbol.EOF.class, Token.EOF.class, ReplacementRule.EOF_TO_EPSILON);
     }
     
-    public ReplacementRule findRule(
-            Class<? extends Symbol> sType, 
-            Class<? extends Token> tType) throws SchemeInterpreterException 
+    public ReplacementRule findRule(Class<? extends Symbol> sType, Class<? extends Token> tType)
+            throws SchemeInterpreterException, NoSuchMethodException,
+                   IllegalAccessException, InvocationTargetException
     {        
         if (!table.containsKey(sType)) {
             throw new SchemeInterpreterException("No predict table entry for " + sType);
@@ -164,22 +102,33 @@ public class PredictTable {
             return table.get(sType).get(tType);
         }
         else {
-            throw missingEntryException(sType, tType);
+            throw makeMissingEntryException(sType, tType);
         }
     }
     
-    private String expectedTokens(Class<? extends Symbol> sType) {
-        return table.get(sType)
-                .keySet()
-                .stream()
-                .map(Class::getSimpleName)
-                .collect(joining(", ", "`", "`"));
+    private String expectedTokens(Class<? extends Symbol> sType) 
+            throws NoSuchMethodException, IllegalAccessException,
+                   IllegalArgumentException, InvocationTargetException
+    {
+        List<Class<? extends Token>> tokenTypes = table.get(sType).keySet().stream()
+                .collect(toList());
+        
+        List<String> tokenReprs = new ArrayList<>();
+        
+        for (Class<? extends Token> tokenType : tokenTypes) {
+            String repr = (String) tokenType.getMethod("repr").invoke(null);
+            tokenReprs.add(String.format("`%s`", repr));
+        }
+        
+        return tokenReprs.stream().collect(joining(", "));
     }
     
-    private SchemeInterpreterException missingEntryException(
+    private SchemeInterpreterException makeMissingEntryException(
             Class<? extends Symbol> sType,
-            Class<? extends Token> tType
-    ) {
+            Class<? extends Token> tType) 
+                throws NoSuchMethodException, IllegalAccessException,
+                       IllegalArgumentException, InvocationTargetException
+    {
         String expectedTokens = expectedTokens(sType);
         String actualToken = tType.getSimpleName();
         String message = 
@@ -187,6 +136,18 @@ public class PredictTable {
                         + "expected one of %s.", actualToken, expectedTokens);
 
         return new SchemeInterpreterException(message);
+    }
+    
+    private void addEntry(
+            Class<? extends Symbol> sType, 
+            Class<? extends Token> tType, 
+            ReplacementRule rule)
+    {
+        if (!table.containsKey(sType)) {
+            table.put(sType, new HashMap<>());
+        }
+        
+        table.get(sType).put(tType, rule);
     }
  
 }

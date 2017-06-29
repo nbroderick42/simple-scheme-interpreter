@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
 import schemeinterpreter.SchemeInterpreterException;
+import static schemeinterpreter.lexer.Token.makeQuote;
 
 /**
  *
@@ -25,6 +26,7 @@ public class Lexer {
     private static final int MAX_TOKEN_LENGTH = 1023;    
     private static final Set<Integer> EXTENDED_CHARS = getExtendedChars();
     
+    private int currChar;
     private final BufferedReader br;    
     private Token currentToken;
 
@@ -33,6 +35,8 @@ public class Lexer {
     {
         this.br = Files.newBufferedReader(pathToFile);       
         this.currentToken = null;
+        
+        scanNextChar();
     }
 
     public static Lexer scanFile(Path pathToFile) 
@@ -42,7 +46,7 @@ public class Lexer {
     }
 
     public Token next() throws IOException, SchemeInterpreterException {
-        currentToken = read();
+        currentToken = readNextToken();
         return currentToken;
     }
     
@@ -53,39 +57,40 @@ public class Lexer {
         return currentToken;
     }
     
-    private Token read() throws IOException, SchemeInterpreterException {
-        int nextChar;
-
-        for (
-            nextChar = br.read();
-            nextChar != -1 && Character.isWhitespace(nextChar);
-            nextChar = br.read()
-        ) {}
-
-        if (nextChar == -1) {
-            return Token.makeEOF();
+    private int scanNextChar() throws IOException {
+        currChar = br.read();
+        return currChar;
+    }
+    
+    private Token readNextToken() throws IOException, SchemeInterpreterException {        
+        while (currChar != -1 && Character.isWhitespace(currChar)) {
+            scanNextChar();
         }
-        else if (nextChar == '(') {
-            return Token.makeLeftParen();
+        
+        if (currChar == -1) {
+            return makeEOF();
         }
-        else if (nextChar == ')') {
-            return Token.makeRightParen();
+        else if (currChar == '(') {
+            return makeLparen();
         }
-        else if (isExtendedChar(nextChar) || Character.isAlphabetic(nextChar)) {
-            return makeIdentifier(nextChar);
+        else if (currChar == ')') {
+            return makeRparen();
         }
-        else if (Character.isDigit(nextChar)) {
-            return makeInteger(nextChar);
+        else if (isExtendedChar(currChar) || Character.isAlphabetic(currChar)) {
+            return makeIdentifier();
         }
-        else if (nextChar == '"') {
+        else if (Character.isDigit(currChar)) {
+            return makeInteger();
+        }
+        else if (currChar == '"') {
             return makeString();
         }
-        else if (nextChar == '\'') {
-            return Token.makeQuote();
+        else if (currChar == '\'') {
+            return makeQuote();
         }
         else {
             String message = String.format(
-                    "Unexpected character '%s' in program", nextChar);
+                    "Unexpected character '%s' in program", currChar);
             throw new SchemeInterpreterException(message);
         }
     }
@@ -103,38 +108,57 @@ public class Lexer {
         return Collections.unmodifiableSet(extendedChars);
     }
 
-    private Token makeIdentifier(int firstChar)
+    private Token makeIdentifier()
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(firstChar, Lexer::isIdentifierChar);
+        String value = getCompleteTokenValue(Lexer::isIdentifierChar);
         return Token.makeIdentifier(value);
     }
 
-    private Token makeInteger(int firstChar)
+    private Token makeInteger()
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(firstChar, Lexer::isIntegerChar);
+        String value = getCompleteTokenValue(Lexer::isIntegerChar);
         return Token.makeInteger(value);
     }
 
     private Token makeString()
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(br.read(), Lexer::isStringChar);
+        String value = getCompleteTokenValue(Lexer::isStringChar);
+        value = value.replaceAll("\"", "");
+        
         return Token.makeString(value);
     }
+    
+    
+    private Token makeEOF() throws IOException {
+        scanNextChar();
+        return Token.makeEOF();
+    }
 
-    private String getCompleteTokenValue(int firstChar, Predicate<Integer> isValidChar)
+    private Token makeLparen() throws IOException {
+        scanNextChar();
+        return Token.makeLparen();
+    }
+
+    private Token makeRparen() throws IOException {
+        scanNextChar();
+        return Token.makeRparen();
+    }
+
+    private String getCompleteTokenValue(Predicate<Integer> isValidChar)
             throws IOException, SchemeInterpreterException 
     {
-        int length = 1, nextChar = br.read();
-        String value = Character.toString((char) firstChar);
+        int length = 0;
+        String value = "";
         
-        while (length <= MAX_TOKEN_LENGTH && isValidChar.test(nextChar)) {
-            value += (char) nextChar;
-            nextChar = br.read(); 
+        do {
+            value += (char) currChar;
+            scanNextChar();
             length++;
         }
+        while (length <= MAX_TOKEN_LENGTH && isValidChar.test(currChar));
 
         if (length > MAX_TOKEN_LENGTH) {
             String message = String.format(
@@ -158,11 +182,12 @@ public class Lexer {
     }
     
     private static boolean isIdentifierChar(int c) {
-        return isNotNewlineOrEOF(c) && ( 
-                    isExtendedChar(c) ||
+        return isNotNewlineOrEOF(c) 
+                && (isExtendedChar(c) ||
                     Character.isAlphabetic(c) ||
-                    Character.isDigit(c)
-               );
+                    Character.isDigit(c))
+                && c != '('
+                && c != ')';
     }
     
     private static boolean isIntegerChar(int c) {

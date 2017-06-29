@@ -19,12 +19,20 @@ public abstract class Token {
             this.value = "(";
         }
         
+        public static java.lang.String repr() {
+            return "(";
+        }
+        
     }
     
     public static class Rparen extends Token {
     
         private Rparen() {
             this.value = ")";
+        }
+        
+        public static java.lang.String repr() {
+            return ")";
         }
         
     }
@@ -35,12 +43,20 @@ public abstract class Token {
             this.value = "'";
         }
         
+        public static java.lang.String repr() {
+            return "'";
+        }
+        
     }
     
     public static class Identifier extends Token {
     
         private Identifier(java.lang.String value) {
             this.value = value;
+        }
+        
+        public static java.lang.String repr() {
+            return "[identifier]";
         }
         
     }
@@ -51,12 +67,20 @@ public abstract class Token {
             this.value = value;
         }
         
+        public static java.lang.String repr() {
+            return "[integer]";
+        }
+        
     }
     
     public static class String extends Token {
     
         private String(java.lang.String value) {
             this.value = value;
+        }
+        
+        public static java.lang.String repr() {
+            return "[string]";
         }
         
     }
@@ -67,13 +91,17 @@ public abstract class Token {
             this.value = "EOF";
         }
         
+        public static java.lang.String repr() {
+            return "[eof]";
+        }
+        
     }
     
-    public static Lparen makeLeftParen() {
+    public static Lparen makeLparen() {
         return new Lparen();
     }
 
-    public static Token makeRightParen() {
+    public static Token makeRparen() {
         return new Rparen();
     }
     
