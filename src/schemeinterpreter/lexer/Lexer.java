@@ -22,43 +22,22 @@ import schemeinterpreter.SchemeInterpreterException;
  */
 public class Lexer {
 
-    private final int MAX_TOKEN_LENGTH = 1023;
+    private static final int MAX_TOKEN_LENGTH = 1023;    
+    private static final Set<Integer> EXTENDED_CHARS = getExtendedChars();
     
-    private final Set<Integer> EXTENDED_CHARS = getExtendedChars();
-    
-    private final Predicate<Integer> IS_NOT_NEWLINE_OR_EOF = 
-            c -> c != -1 && c != '\n';
-    
-    private final Predicate<Integer> IS_STRING_CHAR = c -> c != '"';
-    
-    private final Predicate<Integer> IS_IDENTIFIER_CHAR = c 
-            -> isExtendedChar(c)
-            || Character.isAlphabetic(c)
-            || Character.isDigit(c);
-    
-    private final Predicate<Integer> isStringChar;
-    private final Predicate<Integer> isIdentifierChar;
-    private final Predicate<Integer> isIntegerChar;
-    
-    private final BufferedReader br;
-    
+    private final BufferedReader br;    
     private Token currentToken;
-    
-    private boolean isExtendedChar(int c) {
-        return EXTENDED_CHARS.contains(c);
-    }
-    
-    private Lexer(Path pathToFile) throws IOException, SchemeInterpreterException {
-        this.br = Files.newBufferedReader(pathToFile);
-        
-        this.isStringChar = IS_NOT_NEWLINE_OR_EOF.and(IS_STRING_CHAR);
-        this.isIntegerChar = IS_NOT_NEWLINE_OR_EOF.and(Character::isDigit);
-        this.isIdentifierChar = IS_NOT_NEWLINE_OR_EOF.and(IS_IDENTIFIER_CHAR);
-        
+
+    private Lexer(Path pathToFile) 
+            throws IOException, SchemeInterpreterException
+    {
+        this.br = Files.newBufferedReader(pathToFile);       
         this.currentToken = null;
     }
 
-    public static Lexer scanFile(Path pathToFile) throws IOException, SchemeInterpreterException {
+    public static Lexer scanFile(Path pathToFile) 
+            throws IOException, SchemeInterpreterException 
+    {
         return new Lexer(pathToFile);
     }
 
@@ -127,44 +106,67 @@ public class Lexer {
     private Token makeIdentifier(int firstChar)
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(firstChar, isIdentifierChar);
+        String value = getCompleteTokenValue(firstChar, Lexer::isIdentifierChar);
         return Token.makeIdentifier(value);
     }
 
     private Token makeInteger(int firstChar)
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(firstChar, isIntegerChar);
+        String value = getCompleteTokenValue(firstChar, Lexer::isIntegerChar);
         return Token.makeInteger(value);
     }
 
     private Token makeString()
             throws IOException, SchemeInterpreterException
     {
-        String value = getCompleteTokenValue(br.read(), isStringChar);
+        String value = getCompleteTokenValue(br.read(), Lexer::isStringChar);
         return Token.makeString(value);
     }
 
     private String getCompleteTokenValue(int firstChar, Predicate<Integer> isValidChar)
             throws IOException, SchemeInterpreterException 
     {
-        int length = 1;
+        int length = 1, nextChar = br.read();
         String value = Character.toString((char) firstChar);
         
-        for (
-            int nextChar = br.read();
-            length <= MAX_TOKEN_LENGTH && isValidChar.test(nextChar);
-            nextChar = br.read(), length++
-        ) {
+        while (length <= MAX_TOKEN_LENGTH && isValidChar.test(nextChar)) {
             value += (char) nextChar;
+            nextChar = br.read(); 
+            length++;
         }
 
         if (length > MAX_TOKEN_LENGTH) {
-            String message = "Encountered token longer than 1023 characters";
+            String message = String.format(
+                    "Encountered token longer than %s characters", MAX_TOKEN_LENGTH);
             throw new SchemeInterpreterException(message);
         }
 
         return value;
+    }
+    
+    private static boolean isNotNewlineOrEOF(int c) {
+        return c != -1 && c != '\n';
+    }
+    
+    private static boolean isExtendedChar(int c) {
+        return EXTENDED_CHARS.contains(c);
+    }
+    
+    private static boolean isStringChar(int c) {
+        return isNotNewlineOrEOF(c) && c == '"';
+    }
+    
+    private static boolean isIdentifierChar(int c) {
+        return isNotNewlineOrEOF(c) && ( 
+                    isExtendedChar(c) ||
+                    Character.isAlphabetic(c) ||
+                    Character.isDigit(c)
+               );
+    }
+    
+    private static boolean isIntegerChar(int c) {
+        return isNotNewlineOrEOF(c) && Character.isDigit(c);
     }
 
 }

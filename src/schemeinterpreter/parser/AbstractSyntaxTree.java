@@ -24,7 +24,8 @@ public class AbstractSyntaxTree {
     }
     
     public static AbstractSyntaxTree buildTree(Parser parser) 
-            throws IOException, SchemeInterpreterException 
+            throws IOException, SchemeInterpreterException,
+                   InstantiationException, IllegalAccessException 
     {
         return new AbstractSyntaxTree(parser.parse());
     }

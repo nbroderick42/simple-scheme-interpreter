@@ -208,6 +208,10 @@ public abstract class Symbol {
             consumer.accept(curr);
         }
     }
+    
+    public static Symbol getStartSymbol() {
+        return new Symbol.S();
+    }
 
     public void acceptToken(Token token) {}
     

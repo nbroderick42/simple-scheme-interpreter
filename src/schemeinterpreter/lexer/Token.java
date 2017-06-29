@@ -9,58 +9,100 @@ package schemeinterpreter.lexer;
  *
  * @author nick
  */
-public class Token {
+public abstract class Token {
 
-    private final TokenType type;
-    private final String value;
-
-    private Token(TokenType type, String value) {
-        this.type = type;
-        this.value = value;
+    protected java.lang.String value;
+    
+    public static class Lparen extends Token {
+        
+        private Lparen() {
+            this.value = "(";
+        }
+        
     }
-
-    public static Token makeLeftParen() {
-        return new Token(TokenType.LPAREN, "(");
+    
+    public static class Rparen extends Token {
+    
+        private Rparen() {
+            this.value = ")";
+        }
+        
+    }
+    
+    public static class Quote extends Token {
+    
+        private Quote() {
+            this.value = "'";
+        }
+        
+    }
+    
+    public static class Identifier extends Token {
+    
+        private Identifier(java.lang.String value) {
+            this.value = value;
+        }
+        
+    }
+    
+    public static class Integer extends Token {
+    
+        private Integer(java.lang.String value) {
+            this.value = value;
+        }
+        
+    }
+    
+    public static class String extends Token {
+    
+        private String(java.lang.String value) {
+            this.value = value;
+        }
+        
+    }
+    
+    public static class EOF extends Token {
+    
+        private EOF() {
+            this.value = "EOF";
+        }
+        
+    }
+    
+    public static Lparen makeLeftParen() {
+        return new Lparen();
     }
 
     public static Token makeRightParen() {
-        return new Token(TokenType.RPAREN, ")");
+        return new Rparen();
     }
     
-    public static Token makeQuote() {
-        return new Token(TokenType.QUOTE, "'");
+    public static Quote makeQuote() {
+        return new Quote();
     }
 
-    public static Token makeString(String value) {
-        return new Token(TokenType.STRING, value);
+    public static String makeString(java.lang.String value) {
+        return new String(value);
     }
 
-    public static Token makeIdentifier(String value) {
-        return new Token(TokenType.IDENTIFIER, value);
+    public static Identifier makeIdentifier(java.lang.String value) {
+        return new Identifier(value);
     }
 
-    public static Token makeInteger(String value) {
-        return new Token(TokenType.INTEGER, value);
+    public static Integer makeInteger(java.lang.String value) {
+        return new Integer(value);
     }
 
-    public static Token makeEOF() {
-        return new Token(TokenType.EOF, "");
+    public static EOF makeEOF() {
+        return new EOF();
     }
 
-    public boolean isEOF() {
-        return type == TokenType.EOF;
-    }
-
-    public TokenType getType() {
-        return type;
-    }
-
-    public String getValue() {
+    public java.lang.String getValue() {
         return value;
     }
 
     @Override
-    public String toString() {
-        return String.format("( %s, %s )", type, value);
+    public java.lang.String toString() {
+        return java.lang.String.format("( %s, %s )", getClass(), value);
     }
 }

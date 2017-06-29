@@ -17,7 +17,10 @@ import schemeinterpreter.parser.Parser;
  */
 public class SchemeInterpreter {
 
-    public static void main(String[] args) throws IOException, SchemeInterpreterException {
+    public static void main(String[] args) 
+            throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException
+    {
         Lexer lex = Lexer.scanFile(Paths.get("testfile"));
         Parser parser = Parser.fromLexer(lex);
         AbstractSyntaxTree ast = AbstractSyntaxTree.buildTree(parser);

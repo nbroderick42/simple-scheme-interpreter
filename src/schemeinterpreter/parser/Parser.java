@@ -28,24 +28,28 @@ public class Parser {
         return new Parser(lexer);
     }
     
-    public Symbol parse() throws IOException, SchemeInterpreterException {
-        return parse(new Symbol.S());
+    public Symbol parse() throws IOException, SchemeInterpreterException,
+                                 InstantiationException, IllegalAccessException
+    {
+        return parse(Symbol.getStartSymbol());
     }
     
-    private Symbol parse(Symbol currSymbol) throws IOException, SchemeInterpreterException {
+    private Symbol parse(Symbol currSymbol) 
+            throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException
+    {
         Token currToken = lexer.peek();
-        ReplacementRule rule = predictTable.findRule(currSymbol, currToken.getType());
-        List<Class<? extends Symbol>> replacements = rule.getRHS();
+        
+        Class<? extends Symbol> symType = currSymbol.getClass();
+        Class<? extends Token> tokenType = currToken.getClass();
+        
+        ReplacementRule rule = predictTable.findRule(symType, tokenType);
+        List<Class<? extends Symbol>> rhs = rule.getRHS();
 
-        for (Class<? extends Symbol> symbolType : replacements) {
-            try {
-                Symbol s = symbolType.newInstance();
-                currSymbol.addChild(s);
-                parse(s);
-            }
-            catch (InstantiationException | IllegalAccessException ex) {
-                throw new RuntimeException("Couldn't create Symbol");
-            }
+        for (Class<? extends Symbol> sType : rhs) {
+            Symbol sym = sType.newInstance();
+            currSymbol.addChild(sym);
+            parse(sym);
         }
         
         if (currSymbol.isTerminal()) {
