@@ -122,6 +122,11 @@ public abstract class Symbol {
             return value;
         }
         
+        @Override
+        public java.lang.String toFormattedString() {
+            return java.lang.String.format("Identifier: [%s]", value);
+        }
+        
     }
     
     public static class Integer extends Symbol {
@@ -143,6 +148,11 @@ public abstract class Symbol {
             return value.toString();
         }
         
+        @Override
+        public java.lang.String toFormattedString() {
+            return java.lang.String.format("Integer: [%d]", value);
+        }
+        
     }
     
     public static class String extends Symbol {
@@ -162,6 +172,11 @@ public abstract class Symbol {
         @Override
         public java.lang.String toString() {
             return value;
+        }
+        
+        @Override
+        public java.lang.String toFormattedString() {
+            return java.lang.String.format("String: [%s]", value);
         }
         
     }
@@ -216,5 +231,9 @@ public abstract class Symbol {
     public void acceptToken(Token token) {}
     
     public abstract boolean isTerminal();
+    
+    public java.lang.String toFormattedString() {
+        return toString();
+    }
     
 }

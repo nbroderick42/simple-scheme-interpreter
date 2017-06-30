@@ -43,7 +43,7 @@ public class AbstractSyntaxTree {
     private void buildStringRepr(StringBuilder sb, Symbol curr, int depth) {        
         if (isPrintableTerminal(curr)) {
             String indent = makeIndent(depth);
-            sb.append(indent).append(formatOutput(curr)).append("\n");
+            sb.append(indent).append(curr.toFormattedString()).append("\n");
         }
         else {
             int nextDepth = depth + (curr instanceof Symbol.ListExprs ? 1 : 0);
@@ -51,33 +51,6 @@ public class AbstractSyntaxTree {
                 buildStringRepr(sb, sym, nextDepth)
             );
         }
-    }
-    
-    private String formatOutput(Symbol sym) {
-        if (sym instanceof Symbol.Integer) {
-            return formatOutput((Symbol.Integer) sym);
-        }
-        else if (sym instanceof Symbol.Identifier) {
-            return formatOutput((Symbol.Identifier) sym);
-        }
-        else if (sym instanceof Symbol.String) {
-            return formatOutput((Symbol.String) sym);
-        }
-        else {
-            return sym.toString();
-        }
-    }
-    
-    private String formatOutput(Symbol.Identifier identifier) {
-        return "Identifier: [" + identifier.toString() + "]";
-    }
-    
-    private String formatOutput(Symbol.Integer integer) {
-        return "Integer: [" + integer.toString() + "]";
-    }
-    
-    private String formatOutput(Symbol.String integer) {
-        return "String: [" + integer.toString() + "]";
     }
     
     private static String makeIndent(int depth) {
