@@ -17,6 +17,10 @@ import schemeinterpreter.lexer.Token;
  * @author nick
  */
 public class Parser {
+
+    public static Parser fromLexer(Lexer lexer) {
+        return new Parser(lexer);
+    }
     
     private final Lexer lexer;
     private final PredictTable predictTable = PredictTable.makeTable();
@@ -25,41 +29,32 @@ public class Parser {
         this.lexer = lexer;
     }
     
-    public static Parser fromLexer(Lexer lexer) {
-        return new Parser(lexer);
-    }
-    
     public Symbol parse() throws IOException, SchemeInterpreterException,
                                  InstantiationException, IllegalAccessException,
                                  NoSuchMethodException, InvocationTargetException
     {
-        return parse(Symbol.getStartSymbol());
+        Symbol.makeStartSymbol();
+        return parse(Symbol.makeStartSymbol());
     }
     
-    private Symbol parse(Symbol currSymbol) 
+    public Symbol parse(Symbol currSymbol) 
             throws IOException, SchemeInterpreterException, 
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
-    {
-        Token currToken = lexer.peek();
-        currSymbol.acceptToken(currToken);
-        
+    {   
         Class<? extends Symbol> symType = currSymbol.getClass();
-        Class<? extends Token> tokenType = currToken.getClass();
+        Class<? extends Token> tokenType = lexer.peek().getClass();
         
-        ReplacementRule rule = predictTable.findRule(symType, tokenType);
-        List<Class<? extends Symbol>> rhs = rule.getRHS();
-
-        for (Class<? extends Symbol> sType : rhs) {
-            Symbol sym = sType.newInstance();
-            currSymbol.addChild(sym);
-            parse(sym);
-        }
+        ReplacementRule rule = predictTable.findRule(symType, tokenType);        
+        List<Symbol> children = rule.apply(currSymbol, this);
+        
+        children.forEach(currSymbol::addChild);
         
         if (currSymbol.isTerminal()) {
+            currSymbol.acceptToken(lexer.peek());
             lexer.next();
         }
-
+        
         return currSymbol;
     }
     

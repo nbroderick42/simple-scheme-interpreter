@@ -16,56 +16,25 @@ public abstract class Symbol {
     
     private Symbol nextSibling, firstChild, lastChild;
     
-    public static class S extends Symbol {
-
-        @Override
-        public boolean isTerminal() {
-            return false;
-        }
-    
+    protected Symbol() {
+        this.terminal = false;
     }
     
-    public static class Exprs extends Symbol{
+    public static class S extends Symbol {}
     
-        @Override
-        public boolean isTerminal() {
-            return false;
-        }
-        
-    }
+    public static class Exprs extends Symbol {}
     
-    public static class Expr extends Symbol {
+    public static class Expr extends Symbol {}
     
-        @Override
-        public boolean isTerminal() {
-            return false;
-        }
-        
-    }
+    public static class ListExprs extends Symbol {}
     
-    public static class ListExprs extends Symbol {
+    public static class List extends Symbol {}
     
-        @Override
-        public boolean isTerminal() {
-            return false;
-        }
-        
-    }
-    
-    public static class List extends Symbol {
-    
-        @Override
-        public boolean isTerminal() {
-            return false;
-        }
-        
-    }
     
     public static class Lparen extends Symbol {
     
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public Lparen() {
+            this.terminal = true;
         }
         
         @Override
@@ -77,9 +46,8 @@ public abstract class Symbol {
     
     public static class Rparen extends Symbol {
     
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public Rparen() {
+            this.terminal = true;
         }
         
         @Override
@@ -91,9 +59,8 @@ public abstract class Symbol {
     
     public static class Quote extends Symbol {
     
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public Quote() {
+            this.terminal = true;
         }
         
         @Override
@@ -107,9 +74,8 @@ public abstract class Symbol {
     
         private java.lang.String value;
         
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public Identifier() {
+            this.terminal = true;
         }
         
         @Override
@@ -133,9 +99,8 @@ public abstract class Symbol {
     
         private java.lang.Integer value;
         
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public Integer() {
+            this.terminal = true;
         }
         
         @Override
@@ -159,9 +124,8 @@ public abstract class Symbol {
     
         private java.lang.String value;
         
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public String() {
+            this.terminal = true;
         }
         
         @Override
@@ -183,27 +147,26 @@ public abstract class Symbol {
     
     public static class EOF extends Symbol {
         
-        @Override
-        public boolean isTerminal() {
-            return true;
+        public EOF() {
+            this.terminal = true;
         }
         
         @Override
         public java.lang.String toString() {
             return "";
-        }
+        }       
         
     }
     
     public void addChild(Symbol s) {
         if (firstChild == null) {
             firstChild = s;
-            lastChild = s;
         }
         else {
             lastChild.setNextSibling(s);
-            lastChild = s;
         }
+        
+        lastChild = s;
     }
     
     public void setNextSibling(Symbol nextSibling) {
@@ -224,16 +187,20 @@ public abstract class Symbol {
         }
     }
     
-    public static Symbol getStartSymbol() {
+    public static Symbol makeStartSymbol() {
         return new Symbol.S();
     }
 
     public void acceptToken(Token token) {}
     
-    public abstract boolean isTerminal();
+    public boolean isTerminal() {
+        return terminal;
+    }
     
     public java.lang.String toFormattedString() {
         return toString();
     }
+    
+    protected boolean terminal;
     
 }

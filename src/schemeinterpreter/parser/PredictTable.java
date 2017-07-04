@@ -138,9 +138,7 @@ public class PredictTable {
         return new SchemeInterpreterException(message);
     }
     
-    private void addEntry(
-            Class<? extends Symbol> sType, 
-            Class<? extends Token> tType, 
+    private void addEntry(Class<? extends Symbol> sType, Class<? extends Token> tType, 
             ReplacementRule rule)
     {
         if (!table.containsKey(sType)) {

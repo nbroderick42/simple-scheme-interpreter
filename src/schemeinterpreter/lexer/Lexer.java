@@ -17,19 +17,20 @@ import java.util.stream.Stream;
 import schemeinterpreter.SchemeInterpreterException;
 import static schemeinterpreter.lexer.Token.makeQuote;
 
+
 /**
  *
  * @author nick
  */
 public class Lexer {
-
+    
     private static final int MAX_TOKEN_LENGTH = 1023;    
-    private static final Set<Integer> EXTENDED_CHARS = getExtendedChars();
+    private static final String EXTENDED_CHARS = "!$%&*:<=>?^_~+-'";
     
     private int currChar;
     private final BufferedReader br;    
     private Token currentToken;
-
+    
     private Lexer(Path pathToFile) 
             throws IOException, SchemeInterpreterException
     {
@@ -76,38 +77,32 @@ public class Lexer {
         else if (currChar == ')') {
             return makeRparen();
         }
-        else if (isExtendedChar(currChar) || Character.isAlphabetic(currChar)) {
-            return makeIdentifier();
-        }
-        else if (Character.isDigit(currChar)) {
-            return makeInteger();
+        else if (currChar == '\'') {
+            return makeQuote();
         }
         else if (currChar == '"') {
             return makeString();
         }
-        else if (currChar == '\'') {
-            return makeQuote();
+        else if (isIdentifierChar(currChar)) {
+            return makeIdentifier();
+        }
+        else if (isIntegerChar(currChar)) {
+            return makeInteger();
         }
         else {
             String message = String.format(
-                    "Unexpected character '%s' in program", currChar);
+                    "Syntax error: Unexpected character '%s' in program", currChar);
             throw new SchemeInterpreterException(message);
         }
     }
 
-    private static Set<Integer> getExtendedChars() {
-        Set<Integer> extendedChars = Stream.of(
-                        '!', '$', '%',
-                        '&', '*', ':',
-                        '<', '=', '>',
-                        '?', '^', '_',
-                        '~', '+', '-')
-                        .map(Integer::valueOf)
-                        .collect(toSet());
-
-        return Collections.unmodifiableSet(extendedChars);
+    private Token makeQuote() 
+            throws IOException, SchemeInterpreterException
+    {
+        scanNextChar();
+        return Token.makeQuote();
     }
-
+    
     private Token makeIdentifier()
             throws IOException, SchemeInterpreterException
     {
@@ -162,7 +157,7 @@ public class Lexer {
 
         if (length > MAX_TOKEN_LENGTH) {
             String message = String.format(
-                    "Encountered token longer than %s characters", MAX_TOKEN_LENGTH);
+                    "Syntax error: Encountered token longer than %s characters", MAX_TOKEN_LENGTH);
             throw new SchemeInterpreterException(message);
         }
 
@@ -174,20 +169,18 @@ public class Lexer {
     }
     
     private static boolean isExtendedChar(int c) {
-        return EXTENDED_CHARS.contains(c);
+        return EXTENDED_CHARS.indexOf(c) != -1;
     }
     
     private static boolean isStringChar(int c) {
         return isNotNewlineOrEOF(c) && c == '"';
     }
     
-    private static boolean isIdentifierChar(int c) {
+    private static boolean isIdentifierChar(int c) {        
         return isNotNewlineOrEOF(c) 
                 && (isExtendedChar(c) ||
-                    Character.isAlphabetic(c) ||
-                    Character.isDigit(c))
-                && c != '('
-                && c != ')';
+                    Character.isLetter(c) ||
+                    Character.isDigit(c));
     }
     
     private static boolean isIntegerChar(int c) {

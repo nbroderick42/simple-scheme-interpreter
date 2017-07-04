@@ -5,7 +5,7 @@
  */
 package schemeinterpreter;
 
-import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import schemeinterpreter.lexer.Lexer;
 import schemeinterpreter.parser.AbstractSyntaxTree;
@@ -16,16 +16,32 @@ import schemeinterpreter.parser.Parser;
  * @author nick
  */
 public class SchemeInterpreter {
-
-    public static void main(String[] args) 
-            throws IOException, SchemeInterpreterException, 
-                   InstantiationException, IllegalAccessException
+    
+    public static void main(String[] args) throws Exception
     {
-        Lexer lex = Lexer.scanFile(Paths.get("testfile"));
-        Parser parser = Parser.fromLexer(lex);
-        AbstractSyntaxTree ast = AbstractSyntaxTree.buildTree(parser);
+        if (args.length < 1) {
+            printUsage();
+            System.exit(1);
+        }
         
-        System.out.println(ast);
-    }
+        Path pathToFile = Paths.get(args[0]);
+        
+        Lexer lexer = Lexer.scanFile(pathToFile);
+        Parser parser = Parser.fromLexer(lexer);
+        
+        try {
+            AbstractSyntaxTree ast = AbstractSyntaxTree.buildTree(parser);
+            System.out.println(ast);
+        }
+        catch (SchemeInterpreterException see) {
+            System.out.println(see.getMessage());
+            System.exit(1);
+        }
 
+    }
+    
+    private static void printUsage() {
+        System.out.println("Must supply filename of Scheme code to parse");
+    }
+    
 }

@@ -32,6 +32,10 @@ public class AbstractSyntaxTree {
         return new AbstractSyntaxTree(parser.parse());
     }
     
+    public Symbol getRoot() {
+        return root;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

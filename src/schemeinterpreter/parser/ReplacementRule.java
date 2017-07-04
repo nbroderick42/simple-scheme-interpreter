@@ -5,9 +5,13 @@
  */
 package schemeinterpreter.parser;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
+import static java.util.stream.Collectors.toList;
+import schemeinterpreter.SchemeInterpreterException;
 
 /**
  *
@@ -16,54 +20,274 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public enum ReplacementRule {
     
-    S_TO_EXPRS_EOF(Symbol.S.class, Symbol.Exprs.class, Symbol.EOF.class),
+    S_TO_EXPRS_EOF {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            // Symbol.S S = (Symbol.S) parent;
+            
+            Symbol.Exprs exprs = new Symbol.Exprs();
+            Symbol.EOF eof = new Symbol.EOF();
+            
+            parser.parse(exprs);
+            parser.parse(eof);            
+
+            return asList(exprs, eof);
+        }
+        
+    },
+
+    EXPRS_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) {
+            return asList();
+        }
+        
+    },
     
-    EXPRS_TO_EPSILON(Symbol.Exprs.class),
+    EXPRS_TO_EXPR_EXPRS {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Expr expr = new Symbol.Expr();
+            Symbol.Exprs exprs = new Symbol.Exprs();
+            
+            parser.parse(expr);
+            parser.parse(exprs);
+            
+            return asList(expr, exprs);
+        }
+        
+    },
     
-    EXPRS_TO_EXPR_EXPRS(Symbol.Exprs.class, Symbol.Expr.class, Symbol.Exprs.class),
+    EXPR_TO_QUOTE_EXPR {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Quote quote = new Symbol.Quote();
+            Symbol.Expr expr = new Symbol.Expr();
+            
+            parser.parse(quote);
+            parser.parse(expr);
+            
+            return asList(quote, expr);
+        }
+        
+    },
     
-    EXPR_TO_QUOTE_EXPR(Symbol.Quote.class, Symbol.Exprs.class),
+    EXPR_TO_LIST {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.List list = new Symbol.List();
+            parser.parse(list);
+            
+            return asList(list);
+        }
+        
+    },
     
-    EXPR_TO_LIST(Symbol.Expr.class, Symbol.List.class),
+    EXPR_TO_IDENTIFIER {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Identifier identifier = new Symbol.Identifier();
+            parser.parse(identifier);
+            
+            return asList(identifier);
+        }
+        
+    },
     
-    EXPR_TO_IDENTIFIER(Symbol.Expr.class, Symbol.Identifier.class),
+    EXPR_TO_INTEGER {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Integer integer = new Symbol.Integer();
+            parser.parse(integer);
+            
+            return asList(integer);
+        }
+        
+    },
     
-    EXPR_TO_INTEGER(Symbol.Expr.class, Symbol.Integer.class),
+    EXPR_TO_STRING {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.String string = new Symbol.String();
+            parser.parse(string);
+            
+            return asList(string);
+        }
+        
+    },
     
-    EXPR_TO_STRING(Symbol.Expr.class, Symbol.String.class),
+    LIST_TO_LPAREN_LISTEXPRS_RPAREN {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Lparen lparen = new Symbol.Lparen();
+            Symbol.ListExprs listExprs = new Symbol.ListExprs();
+            Symbol.Rparen rparen = new Symbol.Rparen();
+            
+            parser.parse(lparen);
+            parser.parse(listExprs);
+            parser.parse(rparen);
+            
+            return asList(lparen, listExprs, rparen);
+        }
+        
+    },
     
-    LIST_TO_LPAREN_LISTEXPRS_RPAREN(Symbol.List.class, Symbol.Lparen.class, Symbol.ListExprs.class, Symbol.Rparen.class),
+    LISTEXPR_TO_EXPRS {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Exprs exprs = new Symbol.Exprs();
+            parser.parse(exprs);
+            
+            return asList(exprs);
+        }
+        
+    },
     
-    LISTEXPR_TO_EXPRS(Symbol.ListExprs.class, Symbol.Exprs.class),
+    LPAREN_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    LPAREN_TO_EPSILON(Symbol.Lparen.class),
+    RPAREN_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    RPAREN_TO_EPSILON(Symbol.Rparen.class),
+    QUOTE_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    QUOTE_TO_EPSILON(Symbol.Quote.class),
+    IDENTIFIER_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    IDENTIFIER_TO_EPSILON(Symbol.Identifier.class),
+    INTEGER_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    INTEGER_TO_EPSILON(Symbol.Integer.class),
+    STRING_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
     
-    STRING_TO_EPSILON(Symbol.String.class),
+    EOF_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    };
     
-    EOF_TO_EPSILON(Symbol.EOF.class);
-    
-    private final Class<? extends Symbol> lhs;
-    private final List<Class<? extends Symbol>> rhs;
-    
-    private ReplacementRule(Class<? extends Symbol> lhs, Class<? extends Symbol>... rhs) {
-        this.lhs = lhs;
-        this.rhs = Arrays.asList(rhs);
-    }
-    
-    public Class<? extends Symbol> getLHS() {
-        return lhs;
-    }
-    
-    public List<Class<? extends Symbol>> getRHS() {
-        return Collections.unmodifiableList(rhs);
+    public abstract List<Symbol> apply(Symbol parent, Parser parser) 
+            throws IOException, SchemeInterpreterException, 
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException;
+
+    private static List<Symbol> asList(Symbol... symbols) {
+        List<Symbol> result = Stream.of(symbols).collect(toList());
+        return Collections.unmodifiableList(result);
     }
     
 }
