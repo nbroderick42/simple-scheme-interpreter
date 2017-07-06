@@ -6,13 +6,16 @@
 package schemeinterpreter.lexer;
 
 /**
- * The definition for the Token. Tokens are produced by the Lexer when analyzing
- * the input source file.
+ * The definition for the Token and its subtypes. Tokens are produced by the
+ * Lexer when analyzing the input source file.
  * 
  * @author nick
  */
 public abstract class Token {
-
+    
+    /**
+     * The internal value for each token. Need only be set for
+     */
     private java.lang.String value;
     
     public static class Lparen extends Token {
@@ -99,34 +102,77 @@ public abstract class Token {
         
     }
     
+    /** 
+     * Static factory method that creates an LPAREN token
+     * 
+     * @return an LPAREN Token
+     */
     public static Lparen makeLparen() {
         return new Lparen();
     }
-
+    
+    /** 
+     * Static factory method that creates an RPAREN token
+     * 
+     * @return an RPAREN Token
+     */
     public static Token makeRparen() {
         return new Rparen();
     }
     
+    /** 
+     * Static factory method that creates an QUOTE token
+     * 
+     * @return a QUOTE Token
+     */
     public static Quote makeQuote() {
         return new Quote();
     }
-
+    
+    /** 
+     * Static factory method that creates an STRING token
+     * 
+     * @param value the value to set
+     * @return an STRING Token
+     */
     public static String makeString(java.lang.String value) {
         return new String(value);
     }
-
+    
+    /** 
+     * Static factory method that creates an IDENTIFIER token
+     * 
+     * @param value the value to set
+     * @return an IDENTIFIER Token
+     */
     public static Identifier makeIdentifier(java.lang.String value) {
         return new Identifier(value);
     }
 
+    /** 
+     * Static factory method that creates an INTEGER token
+     * 
+     * @param value the value to set
+     * @return an INTEGER Token
+     */
     public static Integer makeInteger(java.lang.String value) {
         return new Integer(value);
     }
 
+    /** 
+     * Static factory method that creates an EOF token
+     * 
+     * @return an EOF Token
+     */
     public static EOF makeEOF() {
         return new EOF();
     }
-
+    
+    /**
+     * Returns the underlying value for this token.
+     * 
+     * @return The underlying value as a String
+     */
     public java.lang.String getValue() {
         return value;
     }
