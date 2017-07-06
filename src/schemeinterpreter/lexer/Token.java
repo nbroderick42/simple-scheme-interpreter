@@ -6,17 +6,19 @@
 package schemeinterpreter.lexer;
 
 /**
- *
+ * The definition for the Token. Tokens are produced by the Lexer when analyzing
+ * the input source file.
+ * 
  * @author nick
  */
 public abstract class Token {
 
-    protected java.lang.String value;
+    private java.lang.String value;
     
     public static class Lparen extends Token {
         
         private Lparen() {
-            this.value = "(";
+            super.setValue("(");
         }
         
         public static java.lang.String repr() {
@@ -28,7 +30,7 @@ public abstract class Token {
     public static class Rparen extends Token {
     
         private Rparen() {
-            this.value = ")";
+            super.setValue(")");
         }
         
         public static java.lang.String repr() {
@@ -40,7 +42,7 @@ public abstract class Token {
     public static class Quote extends Token {
     
         private Quote() {
-            this.value = "'";
+            super.setValue("'");
         }
         
         public static java.lang.String repr() {
@@ -52,7 +54,7 @@ public abstract class Token {
     public static class Identifier extends Token {
     
         private Identifier(java.lang.String value) {
-            this.value = value;
+            super.setValue(value);
         }
         
         public static java.lang.String repr() {
@@ -64,7 +66,7 @@ public abstract class Token {
     public static class Integer extends Token {
     
         private Integer(java.lang.String value) {
-            this.value = value;
+            super.setValue(value);
         }
         
         public static java.lang.String repr() {
@@ -76,7 +78,7 @@ public abstract class Token {
     public static class String extends Token {
     
         private String(java.lang.String value) {
-            this.value = value;
+            super.setValue(value);
         }
         
         public static java.lang.String repr() {
@@ -88,7 +90,7 @@ public abstract class Token {
     public static class EOF extends Token {
     
         private EOF() {
-            this.value = "EOF";
+            super.setValue("EOF");
         }
         
         public static java.lang.String repr() {
@@ -131,6 +133,13 @@ public abstract class Token {
 
     @Override
     public java.lang.String toString() {
-        return java.lang.String.format("( %s, %s )", getClass(), value);
+        return java.lang.String.format("( %s, %s )", getClass(), getValue());
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(java.lang.String value) {
+        this.value = value;
     }
 }

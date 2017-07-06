@@ -240,7 +240,7 @@ public class Lexer {
 
     /**
      * Generates a RPAREN token. Will advance the current character past the
-     * left parenthesis character just scanned
+     * right parenthesis character just scanned
      * 
      * @return  A RPAREN token
      */
