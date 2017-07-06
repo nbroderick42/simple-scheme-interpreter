@@ -19,33 +19,33 @@ import schemeinterpreter.SchemeInterpreterException;
  */
 public class Lexer {
 
-    /* 
-     * A token in this implementation cannot exceed 1023 characters
+    /**
+     * A token in this implementation cannot exceed 1023 characters.
      */
     private static final int MAX_TOKEN_LENGTH = 1023;
 
-    /* 
+    /** 
      * The set of valid starting characters (in addition to letters and digits)
      * that may begin an identifier.
      */
     private static final String EXTENDED_CHARS = "!$%&*:<=>?^_~+-'";
 
-    /* 
+    /** 
      * The reader for the input file.
      */
     private final BufferedReader br;
 
-    /*
-     * The current character being analyzed by the lexer
+    /**
+     * The current character being analyzed by the lexer.
      */
     private int currChar;
 
-    /*
-     * The most recently produced Token
+    /**
+     * The most recently produced Token.
      */
     private Token currentToken;
     
-    /*
+    /**
      * Creates a new Lexer using the provided Path
      * 
      * @param pathToFile    The path to the file to analyze
@@ -58,20 +58,23 @@ public class Lexer {
         scanNextChar();
     }
     
-    /*
+    /**
      * Static factory method that returns a lexer that analyzes
      * the file at the given path.
      * 
-     * @param pathToFile    The path to the file to analyze
+     * @param pathToFile The path to the file to analyze
      * 
-     * @return              A Lexer which analyzes the given file
+     * @return A Lexer which analyzes the given file
+     * 
+     * @throws java.io.IOException
+     * @throws schemeinterpreter.SchemeInterpreterException
      */
     public static Lexer scanFile(Path pathToFile)
             throws IOException, SchemeInterpreterException {
         return new Lexer(pathToFile);
     }
     
-    /*
+    /**
      * Advances the lexer and returns the next available token from
      * the input file. Will return an instance of Token.EOF if invoked when
      * no more tokens are available.
@@ -81,10 +84,10 @@ public class Lexer {
      * no more tokens can be produced from the file being analyzed.
      */
     
-    /*
+    /**
      * Returns the most recently produced Token from the input file. If invoked
      * before the first Token is produced, this method will cause the first
-     * Token to be produced from the stream (equivalent to an invokation of
+     * Token to be produced from the stream (equivalent to an invocation of
      * {@link next()}).
      * 
      * 
@@ -95,18 +98,18 @@ public class Lexer {
         return currentToken != null ? currentToken : next();
     }
     
-    /*
+    /**
      * Advances the lexer to the next available character in the input file 
      * and returns that character.
      * 
-     * @return  The next available character in the input file
+     * @return The next available character in the input file
      */
     private int scanNextChar() throws IOException {
         currChar = br.read();
         return currChar;
     }
     
-    /*
+    /**
      * Advances the lexer and returns the next available token from
      * the input file. Will return an instance of Token.EOF if invoked when
      * no more tokens are available.
@@ -157,7 +160,7 @@ public class Lexer {
         return currentToken;
     }
     
-    /*
+    /**
      * Generates an IDENTIFIER token. Will advance the current character past
      * all those which comprise the IDENTIFIER.
      * 
@@ -169,7 +172,7 @@ public class Lexer {
         return Token.makeIdentifier(value);
     }
     
-    /*
+    /**
      * Generates an INTEGER token. Will advance the current character past
      * all those which comprise the INTEGER.
      * 
@@ -181,7 +184,7 @@ public class Lexer {
         return Token.makeInteger(value);
     }
     
-    /*
+    /**
      * Generates an STRING token. Will advance the current character past
      * all those which comprise the STRING, as well as strip away the
      * quotation marks which demarcate the STRING.
@@ -202,7 +205,7 @@ public class Lexer {
         return Token.makeString(value);
     }
     
-    /*
+    /**
      * Generates a QUOTE token. Will advance the current character past the
      * quote character just scanned
      * 
@@ -215,7 +218,7 @@ public class Lexer {
         return Token.makeQuote();
     }
     
-    /*
+    /**
      * Generates a EOF token.
      * 
      * @return  A QUOTE token
@@ -224,7 +227,7 @@ public class Lexer {
         return Token.makeEOF();
     }
 
-    /*
+    /**
      * Generates a LPAREN token. Will advance the current character past the
      * left parenthesis character just scanned
      * 
@@ -235,7 +238,7 @@ public class Lexer {
         return Token.makeLparen();
     }
 
-    /*
+    /**
      * Generates a RPAREN token. Will advance the current character past the
      * left parenthesis character just scanned
      * 
@@ -246,7 +249,7 @@ public class Lexer {
         return Token.makeRparen();
     }
     
-    /*
+    /**
      * A convenience method that consumes characters in the stream that comprise
      * a multi-character token and returns a String containing those
      * characters.
@@ -284,7 +287,7 @@ public class Lexer {
         return sb.toString();
     }
     
-    /*
+    /**
      * A convenience method that tests if a character is EOF or a 
      * newline ('\n').
      * 
@@ -296,7 +299,7 @@ public class Lexer {
         return c != -1 && c != '\n';
     }
 
-    /*
+    /**
      * A convenience method that tests if a character is one of the allowable
      * "extended characters" which may begin an IDENTIFIER.
      * 
@@ -309,8 +312,8 @@ public class Lexer {
         return EXTENDED_CHARS.indexOf(c) != -1;
     }
 
-    /*
-     * A convencience method that tests if a character is permitted to be part
+    /**
+     * A convenience method that tests if a character is permitted to be part
      * of a STRING token. A character qualifies if is not a newline (tokens
      * cannot span multiple lines), EOF, or a quotation mark (as this
      * marks the end of the STRING).
@@ -323,8 +326,8 @@ public class Lexer {
         return isNotNewlineOrEOF(c) && c != '"';
     }
 
-    /*
-     * A convencience method that tests if a character is permitted to be part
+    /**
+     * A convenience method that tests if a character is permitted to be part
      * of an IDENTIFIER token. A character qualifies if
      * <ul>
      *      <li>is neither EOF or '\n' (tokens cannot span multiple lines), and</li>
@@ -342,8 +345,8 @@ public class Lexer {
                 || Character.isDigit(c));
     }
     
-    /*
-     * A convencience method that tests if a character is permitted to be part
+    /**
+     * A convenience method that tests if a character is permitted to be part
      * of an INTEGER token. A character qualifies if is a digit.
      * 
      * @param c The character to test
