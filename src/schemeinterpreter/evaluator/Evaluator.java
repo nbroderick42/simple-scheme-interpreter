@@ -75,7 +75,7 @@ public class Evaluator {
         }
         else {
             Atom proc = list.getHead().evaluate(this);
-            assertTrue(proc.isOperation(), "first part of procedure call must be an operation");
+            assertTrue(proc.isOperation(), "first argument is not a procedure");
             
             AtomProcedure op = (AtomProcedure) proc;
             
@@ -88,7 +88,7 @@ public class Evaluator {
     }
     
     
-    public Atom evaluate(BuiltinOperation op) {
+    public Atom evaluate(BuiltinProcedure op) {
         return op;
     }
     
@@ -130,7 +130,7 @@ public class Evaluator {
     private Frame makeGlobalFrame() {
         Frame globalFrame = Frame.makeGlobalFrame();
 
-        for (BuiltinOperation op : BuiltinOperation.values()) {
+        for (BuiltinProcedure op : BuiltinProcedure.values()) {
             globalFrame.bind(op.getToken(), op);
         }
       

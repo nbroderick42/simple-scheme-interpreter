@@ -32,7 +32,7 @@ import schemeinterpreter.evaluator.atom.AtomProcedure;
  * @author nick
  */
 
-public enum BuiltinOperation implements AtomProcedure {
+public enum BuiltinProcedure implements AtomProcedure {
     
     ADD("+") {
     
@@ -406,7 +406,7 @@ public enum BuiltinOperation implements AtomProcedure {
     
         @Override
         public AtomImpl apply(Evaluator evaluator, AtomList args) {
-            return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::lessThan);
+            return applyArithmeticComparisonOperation(evaluator, args, BuiltinProcedure::lessThan);
         }
         
         @Override 
@@ -420,7 +420,7 @@ public enum BuiltinOperation implements AtomProcedure {
         
         @Override
         public AtomImpl apply(Evaluator evaluator, AtomList args) {
-            return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::greaterThan);
+            return applyArithmeticComparisonOperation(evaluator, args, BuiltinProcedure::greaterThan);
         }
         
         @Override 
@@ -434,7 +434,7 @@ public enum BuiltinOperation implements AtomProcedure {
     
         @Override
         public AtomImpl apply(Evaluator evaluator, AtomList args) {
-            return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::equalToInt);
+            return applyArithmeticComparisonOperation(evaluator, args, BuiltinProcedure::equalToInt);
         }
         
         @Override 
@@ -554,7 +554,7 @@ public enum BuiltinOperation implements AtomProcedure {
     
     final String token;
     
-    private BuiltinOperation(String token) {
+    private BuiltinProcedure(String token) {
         this.token = token;
     }
     
