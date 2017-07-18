@@ -5,8 +5,12 @@
  */
 package schemeinterpreter;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import schemeinterpreter.evaluator.EvaluationException;
+import schemeinterpreter.evaluator.Evaluator;
 import schemeinterpreter.lexer.Lexer;
 import schemeinterpreter.parser.AbstractSyntaxTree;
 import schemeinterpreter.parser.Parser;
@@ -25,17 +29,15 @@ public class SchemeInterpreter {
         }
         
         Path pathToFile = Paths.get(args[0]);
-        
         Lexer lexer = Lexer.scanFile(pathToFile);
         Parser parser = Parser.fromLexer(lexer);
         
         try {
             AbstractSyntaxTree ast = AbstractSyntaxTree.buildTree(parser);
-            System.out.println(ast);
+            Evaluator.evaluate(ast);
         }
-        catch (SchemeInterpreterException see) {
-            System.out.println(see.getMessage());
-            System.exit(1);
+        catch (EvaluationException re) {
+            System.out.println(re.getMessage());
         }
 
     }

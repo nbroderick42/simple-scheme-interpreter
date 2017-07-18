@@ -42,6 +42,7 @@ public class PredictTable {
         addEntry(Symbol.S.class, Token.Integer.class, ReplacementRule.S_TO_EXPRS_EOF);
         addEntry(Symbol.S.class, Token.String.class, ReplacementRule.S_TO_EXPRS_EOF);
         addEntry(Symbol.S.class, Token.Lparen.class, ReplacementRule.S_TO_EXPRS_EOF);
+        addEntry(Symbol.S.class, Token.Boolean.class, ReplacementRule.S_TO_EXPRS_EOF);
     }
 
     private void addExprsEntries() {        
@@ -53,6 +54,7 @@ public class PredictTable {
         addEntry(Symbol.Exprs.class, Token.Integer.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
         addEntry(Symbol.Exprs.class, Token.String.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
         addEntry(Symbol.Exprs.class, Token.Lparen.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
+        addEntry(Symbol.Exprs.class, Token.Boolean.class, ReplacementRule.EXPRS_TO_EXPR_EXPRS);
     }
 
     private void addExprEntries() {        
@@ -61,6 +63,7 @@ public class PredictTable {
         addEntry(Symbol.Expr.class, Token.Identifier.class, ReplacementRule.EXPR_TO_IDENTIFIER);
         addEntry(Symbol.Expr.class, Token.Integer.class, ReplacementRule.EXPR_TO_INTEGER);
         addEntry(Symbol.Expr.class, Token.String.class, ReplacementRule.EXPR_TO_STRING);
+        addEntry(Symbol.Expr.class, Token.Boolean.class, ReplacementRule.EXPR_TO_BOOLEAN);
     }
 
     private void addListEntries() {
@@ -74,6 +77,7 @@ public class PredictTable {
         addEntry(Symbol.ListExprs.class, Token.Identifier.class, ReplacementRule.LISTEXPR_TO_EXPRS);
         addEntry(Symbol.ListExprs.class, Token.Integer.class, ReplacementRule.LISTEXPR_TO_EXPRS);
         addEntry(Symbol.ListExprs.class, Token.String.class, ReplacementRule.LISTEXPR_TO_EXPRS);
+        addEntry(Symbol.ListExprs.class, Token.Boolean.class, ReplacementRule.LISTEXPR_TO_EXPRS);
     }
     
     private void addTerminalEntries() {
@@ -84,6 +88,7 @@ public class PredictTable {
         addEntry(Symbol.Identifier.class, Token.Identifier.class, ReplacementRule.IDENTIFIER_TO_EPSILON);
         addEntry(Symbol.String.class, Token.String.class, ReplacementRule.STRING_TO_EPSILON);
         addEntry(Symbol.EOF.class, Token.EOF.class, ReplacementRule.EOF_TO_EPSILON);
+        addEntry(Symbol.Boolean.class, Token.Boolean.class, ReplacementRule.BOOLEAN_TO_EPSILON);
     }
     
     public ReplacementRule findRule(Class<? extends Symbol> sType, Class<? extends Token> tType)

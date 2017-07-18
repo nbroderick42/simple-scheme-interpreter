@@ -2,10 +2,11 @@ package schemeinterpreter.lexer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Predicate;
-import schemeinterpreter.SchemeInterpreterException;
 
 /**
  * The main class used for lexical analysis of a Scheme program.
@@ -45,14 +46,17 @@ public class Lexer {
      * 
      * @param pathToFile    The path to the file to analyze
      */
-    private Lexer(Path pathToFile)
-            throws IOException, SchemeInterpreterException {
-        this.br = Files.newBufferedReader(pathToFile);
-        this.currentToken = null;
-
-        scanNextChar();
+    private Lexer(Path pathToFile) throws IOException {
+        this(Files.newBufferedReader(pathToFile));
     }
     
+    private Lexer(BufferedReader br) throws IOException {
+        this.br = br;
+        this.currentToken = null;
+        
+        scanNextChar();
+    }
+
     /**
      * Static factory method that returns a lexer that analyzes
      * the file at the given path.
@@ -62,13 +66,11 @@ public class Lexer {
      * @return A Lexer which analyzes the given file
      * 
      * @throws java.io.IOException
-     * @throws schemeinterpreter.SchemeInterpreterException
      */
-    public static Lexer scanFile(Path pathToFile)
-            throws IOException, SchemeInterpreterException {
+    public static Lexer scanFile(Path pathToFile) throws IOException {
         return new Lexer(pathToFile);
     }
-    
+
     /**
      * Advances the lexer and returns the next available token from
      * the input file. Will return an instance of Token.EOF if invoked when
@@ -89,7 +91,7 @@ public class Lexer {
      * @return  The most recently produced Token, or the first Token if no Token
      * has yet been produced
      */
-    public Token peek() throws IOException, SchemeInterpreterException {
+    public Token peek() throws IOException {
         return currentToken != null ? currentToken : next();
     }
     
@@ -113,7 +115,7 @@ public class Lexer {
      * @return  The next available token in the file, including possibly EOF if
      * no more tokens can be produced from the file being analyzed.
      */
-    public Token next() throws IOException, SchemeInterpreterException {        
+    public Token next() throws IOException {        
         /*
          * Advance the current character to the next possible token, past
          * any whitespace
@@ -140,19 +142,26 @@ public class Lexer {
         else if (currChar == '"') {
             currentToken = makeString();
         }
-        else if (isIdentifierChar(currChar)) {
-            currentToken = makeIdentifier();
+        else if (currChar == '#') {
+            currentToken = makeBoolean();
         }
         else if (isIntegerChar(currChar)) {
             currentToken = makeInteger();
         }
+        else if (isIdentifierChar(currChar)) {
+            currentToken = makeIdentifier();
+        }
         else {
             String message = String.format(
                     "Syntax error: Unexpected character '%s' in program", currChar);
-            throw new SchemeInterpreterException(message);
+            throw new RuntimeException(message);
         }
         
         return currentToken;
+    }
+    
+    public void discard() {
+        currentToken = null;
     }
     
     /**
@@ -161,8 +170,7 @@ public class Lexer {
      * 
      * @return  An IDENTIFIER Token
      */
-    private Token makeIdentifier()
-            throws IOException, SchemeInterpreterException {
+    private Token makeIdentifier() throws IOException {
         String value = getCompleteTokenValue(Lexer::isIdentifierChar);
         return Token.makeIdentifier(value);
     }
@@ -173,10 +181,14 @@ public class Lexer {
      * 
      * @return  An INTEGER Token
      */
-    private Token makeInteger()
-            throws IOException, SchemeInterpreterException {
+    private Token makeInteger() throws IOException {
         String value = getCompleteTokenValue(Lexer::isIntegerChar);
         return Token.makeInteger(value);
+    }
+    
+    private Token makeBoolean() throws IOException {
+        String value = getCompleteTokenValue(Lexer::isIdentifierChar);
+        return Token.makeBoolean(value);
     }
     
     /**
@@ -186,8 +198,7 @@ public class Lexer {
      * 
      * @return  An STRING Token
      */
-    private Token makeString()
-            throws IOException, SchemeInterpreterException {
+    private Token makeString() throws IOException {
         String value = getCompleteTokenValue(Lexer::isStringChar);
         value = value.replaceAll("\"", "");
         
@@ -206,8 +217,7 @@ public class Lexer {
      * 
      * @return  A QUOTE token
      */
-    private Token makeQuote()
-            throws IOException, SchemeInterpreterException {
+    private Token makeQuote() throws IOException {
         scanNextChar();
         
         return Token.makeQuote();
@@ -261,8 +271,7 @@ public class Lexer {
      * @throws SchemeInterpreterException   If the token exceeds the maximum
      * allowed length
      */
-    private String getCompleteTokenValue(Predicate<Integer> isValidChar)
-            throws IOException, SchemeInterpreterException {
+    private String getCompleteTokenValue(Predicate<Integer> isValidChar) throws IOException {
         int length = 0;
         StringBuilder sb = new StringBuilder();
 
@@ -276,7 +285,7 @@ public class Lexer {
         if (length > MAX_TOKEN_LENGTH) {
             String message = String.format(
                     "Syntax error: Encountered token longer than %s characters", MAX_TOKEN_LENGTH);
-            throw new SchemeInterpreterException(message);
+            throw new RuntimeException(message);
         }
 
         return sb.toString();

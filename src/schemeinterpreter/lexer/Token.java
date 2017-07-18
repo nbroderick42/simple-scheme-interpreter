@@ -85,6 +85,18 @@ public abstract class Token {
         
     }
     
+    public static class Boolean extends Token {
+    
+        private Boolean(java.lang.String value) {
+            super.setValue(value);
+        }
+
+        public static java.lang.String repr() {
+            return "[boolean]";
+        }
+    
+    }
+    
     public static class EOF extends Token {
     
         private EOF() {
@@ -152,6 +164,10 @@ public abstract class Token {
      */
     public static Integer makeInteger(java.lang.String value) {
         return new Integer(value);
+    }
+    
+    public static Boolean makeBoolean(java.lang.String value) {
+        return new Boolean(value);
     }
 
     /** 

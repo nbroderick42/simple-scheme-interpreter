@@ -3,7 +3,6 @@ package schemeinterpreter.parser;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import schemeinterpreter.SchemeInterpreterException;
 
 /**
  *
@@ -20,8 +19,7 @@ public class AbstractSyntaxTree {
     }
     
     public static AbstractSyntaxTree buildTree(Parser parser) 
-            throws IOException, SchemeInterpreterException,
-                   InstantiationException, IllegalAccessException, 
+            throws IOException, InstantiationException, IllegalAccessException, 
                    NoSuchMethodException, InvocationTargetException 
     {
         return new AbstractSyntaxTree(parser.parse());

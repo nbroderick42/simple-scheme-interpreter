@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
-import schemeinterpreter.SchemeInterpreterException;
+import schemeinterpreter.evaluator.AtomImpl;
 
 /**
  *
@@ -19,17 +19,17 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException, 
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            // Symbol.S S = (Symbol.S) parent;
-            
             Symbol.Exprs exprs = new Symbol.Exprs();
             Symbol.EOF eof = new Symbol.EOF();
             
             parser.parse(exprs);
-            parser.parse(eof);            
+            parser.parse(eof);
+            
+            parent.setEval(exprs.getEval());
 
             return asList(exprs, eof);
         }
@@ -40,6 +40,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) {
+            parent.setEval(AtomImpl.List.makeEmptyList());
             return asList();
         }
         
@@ -49,7 +50,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException, 
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -58,6 +59,11 @@ public enum ReplacementRule {
             
             parser.parse(expr);
             parser.parse(exprs);
+            
+            AtomImpl.List exprs1Eval = (AtomImpl.List) exprs.getEval();
+            exprs1Eval.prepend(expr.getEval());
+            
+            parent.setEval(exprs.getEval());
             
             return asList(expr, exprs);
         }
@@ -68,7 +74,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -77,6 +83,9 @@ public enum ReplacementRule {
             
             parser.parse(quote);
             parser.parse(expr);
+            
+            expr.getEval().setLazy(true);
+            parent.setEval(expr.getEval());
             
             return asList(quote, expr);
         }
@@ -87,12 +96,14 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
             Symbol.List list = new Symbol.List();
             parser.parse(list);
+            
+            parent.setEval(list.getEval());
             
             return asList(list);
         }
@@ -103,12 +114,14 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
             Symbol.Identifier identifier = new Symbol.Identifier();
             parser.parse(identifier);
+            
+            parent.setEval(AtomImpl.Identifier.make(identifier));
             
             return asList(identifier);
         }
@@ -119,12 +132,14 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
             Symbol.Integer integer = new Symbol.Integer();
             parser.parse(integer);
+            
+            parent.setEval(AtomImpl.Integer.make(integer));
             
             return asList(integer);
         }
@@ -135,14 +150,34 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
             Symbol.String string = new Symbol.String();
             parser.parse(string);
             
+            parent.setEval(AtomImpl.String.make(string));
+            
             return asList(string);
+        }
+        
+    },
+    
+    EXPR_TO_BOOLEAN {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException,
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            Symbol.Boolean bool = new Symbol.Boolean();
+            parser.parse(bool);
+            
+            parent.setEval(AtomImpl.Boolean.make(bool));
+            
+            return asList(bool);
         }
         
     },
@@ -151,7 +186,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -163,6 +198,8 @@ public enum ReplacementRule {
             parser.parse(listExprs);
             parser.parse(rparen);
             
+            parent.setEval(listExprs.getEval());
+            
             return asList(lparen, listExprs, rparen);
         }
         
@@ -172,12 +209,14 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
             Symbol.Exprs exprs = new Symbol.Exprs();
             parser.parse(exprs);
+            
+            parent.setEval(exprs.getEval());
             
             return asList(exprs);
         }
@@ -188,7 +227,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -201,7 +240,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -214,7 +253,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -227,7 +266,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -240,7 +279,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -253,7 +292,20 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
+                   InstantiationException, IllegalAccessException,
+                   NoSuchMethodException, InvocationTargetException
+        {
+            return asList();
+        }
+        
+    },
+    
+    BOOLEAN_TO_EPSILON {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -266,7 +318,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) 
-                throws IOException, SchemeInterpreterException, 
+                throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
@@ -276,7 +328,7 @@ public enum ReplacementRule {
     };
     
     public abstract List<Symbol> apply(Symbol parent, Parser parser) 
-            throws IOException, SchemeInterpreterException, 
+            throws IOException,
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException;
 

@@ -10,11 +10,19 @@ package schemeinterpreter;
  * @author nick
  */
 @SuppressWarnings("serial")
-public class SchemeInterpreterException extends Exception {
+public class SchemeInterpreterException extends RuntimeException {
 
+    /**
+     * Creates a new instance of <code>SchemeInterpreterException</code> without detail message.
+     */
     public SchemeInterpreterException() {
     }
 
+    /**
+     * Constructs an instance of <code>SchemeInterpreterException</code> with the specified detail message.
+     *
+     * @param msg the detail message.
+     */
     public SchemeInterpreterException(String msg) {
         super(msg);
     }

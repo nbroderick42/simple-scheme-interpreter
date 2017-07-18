@@ -1,6 +1,7 @@
 package schemeinterpreter.parser;
 
 import java.util.function.Consumer;
+import schemeinterpreter.evaluator.AtomImpl;
 import schemeinterpreter.lexer.Token;
 
 /**
@@ -10,6 +11,10 @@ import schemeinterpreter.lexer.Token;
 public abstract class Symbol {
     
     private Symbol nextSibling, firstChild, lastChild;
+        
+    private boolean terminal;
+    
+    private AtomImpl eval;
     
     protected Symbol() {
         this.terminal = false;
@@ -25,11 +30,10 @@ public abstract class Symbol {
     
     public static class List extends Symbol {}
     
-    
     public static class Lparen extends Symbol {
     
         public Lparen() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -42,7 +46,7 @@ public abstract class Symbol {
     public static class Rparen extends Symbol {
     
         public Rparen() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -55,7 +59,7 @@ public abstract class Symbol {
     public static class Quote extends Symbol {
     
         public Quote() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -70,7 +74,7 @@ public abstract class Symbol {
         private java.lang.String value;
         
         public Identifier() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -80,6 +84,10 @@ public abstract class Symbol {
         
         @Override
         public java.lang.String toString() {
+            return value;
+        }
+        
+        public java.lang.String getValue() {
             return value;
         }
         
@@ -95,7 +103,7 @@ public abstract class Symbol {
         private java.lang.Integer value;
         
         public Integer() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -113,6 +121,9 @@ public abstract class Symbol {
             return java.lang.String.format("Integer: [%d]", value);
         }
         
+        public java.lang.Integer getValue() {
+            return value;
+        }
     }
     
     public static class String extends Symbol {
@@ -120,7 +131,7 @@ public abstract class Symbol {
         private java.lang.String value;
         
         public String() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -138,12 +149,58 @@ public abstract class Symbol {
             return java.lang.String.format("String: [%s]", value);
         }
         
+        public java.lang.String getValue() {
+            return value;
+        }
+        
+    }
+    
+    public static class Boolean extends Symbol {
+    
+        private java.lang.Boolean value;
+        
+        public Boolean() {
+            super.setTerminal(true);
+        }
+        
+        @Override
+        public void acceptToken(Token token) {
+            java.lang.String tokenValue = token.getValue();
+            
+            switch (tokenValue) {
+                case "#t":
+                    this.value = true;
+                    break;
+                case "#f":
+                    this.value = false;
+                    break;
+                default:
+                    java.lang.String message = 
+                            java.lang.String.format("`%s' is not a valid boolean", tokenValue);
+                    throw new RuntimeException(message);
+            }
+        }
+        
+        @Override
+        public java.lang.String toString() {
+            return value.toString();
+        }
+        
+        @Override
+        public java.lang.String toFormattedString() {
+            return java.lang.String.format("String: [%s]", value);
+        }
+        
+        public java.lang.Boolean getValue() {
+            return value;
+        }
+        
     }
     
     public static class EOF extends Symbol {
         
         public EOF() {
-            this.terminal = true;
+            super.setTerminal(true);
         }
         
         @Override
@@ -195,7 +252,24 @@ public abstract class Symbol {
     public java.lang.String toFormattedString() {
         return toString();
     }
-    
-    protected boolean terminal;
-    
+
+    /**
+     * @param terminal the terminal to set
+     */
+    public void setTerminal(boolean terminal) {
+        this.terminal = terminal;
+    }
+
+    public AtomImpl getEval() {
+        return eval;
+    }
+
+    public void setEval(AtomImpl eval) {
+        this.eval = eval;
+    }
+
+    public boolean isEOF() {
+        return this instanceof EOF;
+    }
+
 }
