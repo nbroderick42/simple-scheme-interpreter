@@ -1,12 +1,30 @@
 package schemeinterpreter.parser;
 
+import schemeinterpreter.parser.symbol.SymbolString;
+import schemeinterpreter.parser.symbol.SymbolQuote;
+import schemeinterpreter.parser.symbol.SymbolListExprs;
+import schemeinterpreter.parser.symbol.SymbolExprs;
+import schemeinterpreter.parser.symbol.SymbolLparen;
+import schemeinterpreter.parser.symbol.SymbolRparen;
+import schemeinterpreter.parser.symbol.SymbolIdentifier;
+import schemeinterpreter.parser.symbol.SymbolList;
+import schemeinterpreter.parser.symbol.SymbolExpr;
+import schemeinterpreter.parser.symbol.SymbolEOF;
+import schemeinterpreter.parser.symbol.Symbol;
+import schemeinterpreter.parser.symbol.SymbolBoolean;
+import schemeinterpreter.parser.symbol.SymbolInteger;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import schemeinterpreter.evaluator.atom.AtomBoolean;
 import static java.util.stream.Collectors.toList;
-import schemeinterpreter.evaluator.AtomImpl;
+import schemeinterpreter.evaluator.atom.AtomImpl;
+import schemeinterpreter.evaluator.atom.AtomList;
+import schemeinterpreter.evaluator.atom.AtomIdentifier;
+import schemeinterpreter.evaluator.atom.AtomInteger;
+import schemeinterpreter.evaluator.atom.AtomString;
 
 /**
  *
@@ -23,8 +41,8 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Exprs exprs = new Symbol.Exprs();
-            Symbol.EOF eof = new Symbol.EOF();
+            SymbolExprs exprs = new SymbolExprs();
+            SymbolEOF eof = new SymbolEOF();
             
             parser.parse(exprs);
             parser.parse(eof);
@@ -40,7 +58,7 @@ public enum ReplacementRule {
         
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser) {
-            parent.setEval(AtomImpl.List.makeEmptyList());
+            parent.setEval(AtomList.makeEmptyList());
             return asList();
         }
         
@@ -54,13 +72,13 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Expr expr = new Symbol.Expr();
-            Symbol.Exprs exprs = new Symbol.Exprs();
+            SymbolExpr expr = new SymbolExpr();
+            SymbolExprs exprs = new SymbolExprs();
             
             parser.parse(expr);
             parser.parse(exprs);
             
-            AtomImpl.List exprs1Eval = (AtomImpl.List) exprs.getEval();
+            AtomList exprs1Eval = (AtomList) exprs.getEval();
             exprs1Eval.prepend(expr.getEval());
             
             parent.setEval(exprs.getEval());
@@ -78,8 +96,8 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Quote quote = new Symbol.Quote();
-            Symbol.Expr expr = new Symbol.Expr();
+            SymbolQuote quote = new SymbolQuote();
+            SymbolExpr expr = new SymbolExpr();
             
             parser.parse(quote);
             parser.parse(expr);
@@ -100,7 +118,7 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.List list = new Symbol.List();
+            SymbolList list = new SymbolList();
             parser.parse(list);
             
             parent.setEval(list.getEval());
@@ -118,10 +136,10 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Identifier identifier = new Symbol.Identifier();
+            SymbolIdentifier identifier = new SymbolIdentifier();
             parser.parse(identifier);
             
-            parent.setEval(AtomImpl.Identifier.make(identifier));
+            parent.setEval(AtomIdentifier.make(identifier));
             
             return asList(identifier);
         }
@@ -136,10 +154,10 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Integer integer = new Symbol.Integer();
+            SymbolInteger integer = new SymbolInteger();
             parser.parse(integer);
             
-            parent.setEval(AtomImpl.Integer.make(integer));
+            parent.setEval(AtomInteger.make(integer));
             
             return asList(integer);
         }
@@ -154,10 +172,10 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.String string = new Symbol.String();
+            SymbolString string = new SymbolString();
             parser.parse(string);
             
-            parent.setEval(AtomImpl.String.make(string));
+            parent.setEval(AtomString.make(string));
             
             return asList(string);
         }
@@ -172,10 +190,10 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Boolean bool = new Symbol.Boolean();
+            SymbolBoolean bool = new SymbolBoolean();
             parser.parse(bool);
             
-            parent.setEval(AtomImpl.Boolean.make(bool));
+            parent.setEval(AtomBoolean.make(bool));
             
             return asList(bool);
         }
@@ -190,9 +208,9 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Lparen lparen = new Symbol.Lparen();
-            Symbol.ListExprs listExprs = new Symbol.ListExprs();
-            Symbol.Rparen rparen = new Symbol.Rparen();
+            SymbolLparen lparen = new SymbolLparen();
+            SymbolListExprs listExprs = new SymbolListExprs();
+            SymbolRparen rparen = new SymbolRparen();
             
             parser.parse(lparen);
             parser.parse(listExprs);
@@ -213,7 +231,7 @@ public enum ReplacementRule {
                    InstantiationException, IllegalAccessException,
                    NoSuchMethodException, InvocationTargetException
         {
-            Symbol.Exprs exprs = new Symbol.Exprs();
+            SymbolExprs exprs = new SymbolExprs();
             parser.parse(exprs);
             
             parent.setEval(exprs.getEval());

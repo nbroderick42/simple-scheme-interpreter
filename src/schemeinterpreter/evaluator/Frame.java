@@ -5,6 +5,8 @@
  */
 package schemeinterpreter.evaluator;
 
+import schemeinterpreter.evaluator.atom.Atom;
+import schemeinterpreter.evaluator.atom.AtomIdentifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ public class Frame {
     
     private Frame parent;
     
-    private final Map<AtomImpl.Identifier, Atom> table;
+    private final Map<AtomIdentifier, Atom> table;
     
     private Frame(Frame parent) {
         this.parent = parent;
@@ -28,19 +30,19 @@ public class Frame {
         return new Frame(null);
     }
     
-    public void bind(AtomImpl.Identifier id, Atom val) {
+    public void bind(AtomIdentifier id, Atom val) {
         table.put(id, val);
     }
     
     public void bind(String identifier, Atom val) {
-        table.put(AtomImpl.Identifier.make(identifier), val);
+        table.put(AtomIdentifier.make(identifier), val);
     }
     
-    public void bind(Map.Entry<AtomImpl.Identifier, Atom> entry) {
+    public void bind(Map.Entry<AtomIdentifier, Atom> entry) {
         table.put(entry.getKey(), entry.getValue());
     }
     
-    public Atom resolve(AtomImpl.Identifier id) {
+    public Atom resolve(AtomIdentifier id) {
         for (Frame curr = this; curr != null; curr = curr.getParent()) {
             if (curr.getTable().containsKey(id)) {
                 return curr.getTable().get(id);
@@ -49,7 +51,7 @@ public class Frame {
         return null;
     }
     
-    public boolean isBound(AtomImpl.Identifier id) {
+    public boolean isBound(AtomIdentifier id) {
         return resolve(id) != null;
     }
     
@@ -57,7 +59,7 @@ public class Frame {
         return parent;
     }
     
-    private Map<AtomImpl.Identifier, Atom> getTable() {
+    private Map<AtomIdentifier, Atom> getTable() {
         return Collections.unmodifiableMap(table);
     }
 

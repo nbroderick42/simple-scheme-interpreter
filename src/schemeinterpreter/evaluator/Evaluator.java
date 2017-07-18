@@ -5,11 +5,21 @@
  */
 package schemeinterpreter.evaluator;
 
+import schemeinterpreter.evaluator.atom.AtomVoid;
+import schemeinterpreter.evaluator.atom.AtomBoolean;
+import schemeinterpreter.evaluator.atom.AtomImpl;
+import schemeinterpreter.evaluator.atom.AtomString;
+import schemeinterpreter.evaluator.atom.Atom;
+import schemeinterpreter.evaluator.atom.AtomProcedure;
+import schemeinterpreter.evaluator.atom.AtomInteger;
+import schemeinterpreter.evaluator.atom.AtomLambda;
+import schemeinterpreter.evaluator.atom.AtomList;
+import schemeinterpreter.evaluator.atom.AtomIdentifier;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import schemeinterpreter.parser.AbstractSyntaxTree;
-import schemeinterpreter.parser.Symbol;
+import schemeinterpreter.parser.symbol.Symbol;
 
 /**
  *
@@ -29,10 +39,9 @@ public class Evaluator {
     public static void evaluate(AbstractSyntaxTree ast) {
         new Evaluator(ast).evaluate();
     }
-    
-    
+
     private void evaluate() {
-        AtomImpl.List atoms = (AtomImpl.List) startSymbol.getEval();
+        AtomList atoms = (AtomList) startSymbol.getEval();
         atoms.forEach(atom -> {
             Atom eval = atom.evaluate(this);
             System.out.println("=> " + eval);
@@ -43,7 +52,7 @@ public class Evaluator {
         return atom.evaluate(this);
     }
     
-    public Atom evaluate(AtomImpl.Identifier id) {
+    public Atom evaluate(AtomIdentifier id) {
         if (id.isLazy()) {
             return id;
         }
@@ -52,15 +61,15 @@ public class Evaluator {
         }
     }
     
-    public Atom evaluate(AtomImpl.Integer integer) {
+    public Atom evaluate(AtomInteger integer) {
         return integer;
     }
     
-    public Atom evaluate(AtomImpl.String string) {
+    public Atom evaluate(AtomString string) {
         return string;
     }
     
-    public Atom evaluate(AtomImpl.List list) {
+    public Atom evaluate(AtomList list) {
         if (list.isLazy() || list.isEmpty()) {
             return list;
         }
@@ -68,13 +77,13 @@ public class Evaluator {
             Atom proc = list.getHead().evaluate(this);
             assertTrue(proc.isOperation(), "first part of procedure call must be an operation");
             
-            AtomImpl.Operation op = (AtomImpl.Operation) proc;
+            AtomProcedure op = (AtomProcedure) proc;
             
             return op.apply(this, list.getTail());
         }
     }
     
-    public Atom evaluate(AtomImpl.Lambda op) {
+    public Atom evaluate(AtomLambda op) {
         return op;
     }
     
@@ -83,11 +92,11 @@ public class Evaluator {
         return op;
     }
     
-    public AtomImpl evaluate(AtomImpl.Boolean bool) {
+    public AtomImpl evaluate(AtomBoolean bool) {
         return bool;
     }
     
-    public AtomImpl evaluate(AtomImpl.Void v) {
+    public AtomImpl evaluate(AtomVoid v) {
         return null;
     }
     
@@ -110,11 +119,11 @@ public class Evaluator {
         return result;
     }
 
-    public void bindToCurrentFrame(AtomImpl.Identifier id, Atom value) {
+    public void bindToCurrentFrame(AtomIdentifier id, Atom value) {
         currentFrame.bind(id, value);
     }
     
-    public void bindToCurrentFrame(Map.Entry<AtomImpl.Identifier, Atom> entry) {
+    public void bindToCurrentFrame(Map.Entry<AtomIdentifier, Atom> entry) {
         currentFrame.bind(entry.getKey(), entry.getValue());
     }
 
@@ -132,11 +141,11 @@ public class Evaluator {
         return currentFrame;
     }
     
-    public boolean isBound(AtomImpl.Identifier id) {
+    public boolean isBound(AtomIdentifier id) {
         return currentFrame.isBound(id);
     }
     
-    public Atom getValue(AtomImpl.Identifier id) {
+    public Atom getValue(AtomIdentifier id) {
         return currentFrame.resolve(id);
     }
     

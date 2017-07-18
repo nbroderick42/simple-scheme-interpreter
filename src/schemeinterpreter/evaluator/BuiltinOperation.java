@@ -5,6 +5,14 @@
  */
 package schemeinterpreter.evaluator;
 
+import schemeinterpreter.evaluator.atom.AtomVoid;
+import schemeinterpreter.evaluator.atom.AtomBoolean;
+import schemeinterpreter.evaluator.atom.AtomImpl;
+import schemeinterpreter.evaluator.atom.Atom;
+import schemeinterpreter.evaluator.atom.AtomInteger;
+import schemeinterpreter.evaluator.atom.AtomLambda;
+import schemeinterpreter.evaluator.atom.AtomList;
+import schemeinterpreter.evaluator.atom.AtomIdentifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -13,23 +21,23 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import static schemeinterpreter.evaluator.AtomImpl.Lambda.evaluateListAndTakeLast;
+import static schemeinterpreter.evaluator.atom.AtomLambda.evaluateListAndTakeLast;
 import static schemeinterpreter.evaluator.Evaluator.assertTrue;
-import static schemeinterpreter.evaluator.Atom.assertIsBoolean;
-import static schemeinterpreter.evaluator.AtomImpl.List.toAtomList;
-import schemeinterpreter.evaluator.AtomImpl.Operation;
+import static schemeinterpreter.evaluator.atom.Atom.assertIsBoolean;
+import static schemeinterpreter.evaluator.atom.AtomList.toAtomList;
+import schemeinterpreter.evaluator.atom.AtomProcedure;
 
 /**
  *
  * @author nick
  */
 
-public enum BuiltinOperation implements Operation {
+public enum BuiltinOperation implements AtomProcedure {
     
     ADD("+") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticOperation(evaluator, args, Math::addExact, 0);
         }
         
@@ -43,7 +51,7 @@ public enum BuiltinOperation implements Operation {
     SUBTRACT("-") {
         
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticOperation(evaluator, args, Math::subtractExact, 0);
         }
         
@@ -57,7 +65,7 @@ public enum BuiltinOperation implements Operation {
     MULTIPLY("*") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticOperation(evaluator, args, Math::multiplyExact, 1);
         }
         
@@ -71,7 +79,7 @@ public enum BuiltinOperation implements Operation {
     DIVIDE("/") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             try {
                 return applyArithmeticOperation(evaluator, args, Math::floorDiv, 1);
             }
@@ -90,13 +98,13 @@ public enum BuiltinOperation implements Operation {
     CDR("cdr") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {            
+        public Atom apply(Evaluator evaluator, AtomList args) {            
             assertTrue(args.isSingleton(), "cdr takes exactly one argument"); 
             
             Atom firstArg = args.getHead();
             assertTrue(firstArg.isList(), "argument to cdr must be a list");
             
-            AtomImpl.List list = (AtomImpl.List) firstArg;
+            AtomList list = (AtomList) firstArg;
             assertTrue(!list.isEmpty(), "cdr cannot take tail of empty list");
             
             return list.getTail();
@@ -112,13 +120,13 @@ public enum BuiltinOperation implements Operation {
     CAR("car") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.isSingleton(), "car takes exactly one argument");
             
             Atom firstArg = args.getHead();
             assertTrue(firstArg.isList(), "argument to car must be a list");
             
-            AtomImpl.List list = (AtomImpl.List) firstArg.evaluate(evaluator);
+            AtomList list = (AtomList) firstArg.evaluate(evaluator);
             
             return list.getHead();
         }
@@ -133,14 +141,14 @@ public enum BuiltinOperation implements Operation {
     CONS("cons") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.isPair(), "cons takes exactly two arguments");   
             
             Atom firstArg = args.getHead();
             Atom secondArg = args.getTail().getHead();
                        
             assertTrue(secondArg.isList(), "second argument to cons must be a list");
-            AtomImpl.List list = (AtomImpl.List) secondArg;
+            AtomList list = (AtomList) secondArg;
             
             list.prepend(firstArg);
             
@@ -157,7 +165,7 @@ public enum BuiltinOperation implements Operation {
     LIST("list") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             return args.stream()
                     .map(evaluator::evaluate)
                     .collect(toAtomList());
@@ -173,7 +181,7 @@ public enum BuiltinOperation implements Operation {
     DEFINE("define") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() == 2, "define takes exactly 2 arguments");
             
             Atom firstArg = args.getHead();
@@ -181,12 +189,12 @@ public enum BuiltinOperation implements Operation {
             
             Atom secondArg = args.getTail().getHead();
             
-            AtomImpl.Identifier id = (AtomImpl.Identifier) firstArg;
+            AtomIdentifier id = (AtomIdentifier) firstArg;
             Atom expr = secondArg.evaluate(evaluator);
             
             evaluator.bindToCurrentFrame(id, expr);
             
-            return AtomImpl.Void.getInstance();
+            return AtomVoid.getInstance();
         }
         
         @Override 
@@ -199,7 +207,7 @@ public enum BuiltinOperation implements Operation {
     LET("let") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             Function<Frame, Atom> impl = scope -> {
                 
                 assertTrue(args.size() >= 1, "let takes at least one argument");
@@ -207,17 +215,17 @@ public enum BuiltinOperation implements Operation {
                 Atom firstArg = args.getHead();
                 assertTrue(firstArg.isList(), "first argument to let must be a list");
 
-                AtomImpl.List bindings = (AtomImpl.List) firstArg;
+                AtomList bindings = (AtomList) firstArg;
 
-                Map<AtomImpl.Identifier, Atom> valMap = new HashMap<>(); 
+                Map<AtomIdentifier, Atom> valMap = new HashMap<>(); 
 
                 bindings.forEach(atom -> {
                     assertTrue(atom.isListPair(), "first argument must be a list of pairs");
-                    AtomImpl.List pair =  (AtomImpl.List) atom;
+                    AtomList pair =  (AtomList) atom;
 
                     Atom firstElem = pair.getHead();
                     assertTrue(firstElem.isIdentifier(), "pairs must be of the form (identifier, expr)");
-                    AtomImpl.Identifier id = (AtomImpl.Identifier) firstElem;
+                    AtomIdentifier id = (AtomIdentifier) firstElem;
 
                     if (valMap.containsKey(id)) {
                         throw new EvaluationException("cannot bind to already bound identifier `" + id + "'");
@@ -229,7 +237,7 @@ public enum BuiltinOperation implements Operation {
                 });
             
                 valMap.entrySet().stream().forEach(scope::bind);
-                AtomImpl.List exprs = args.getTail();
+                AtomList exprs = args.getTail();
 
                 return evaluateListAndTakeLast(evaluator, exprs);
             };
@@ -247,7 +255,7 @@ public enum BuiltinOperation implements Operation {
     LET_STAR("let*") {
         //TODO: assertions here
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             Function<Frame, Atom> impl = scope -> {
             
                 assertTrue(args.size() >= 1, "let* takes at least one argument");
@@ -255,21 +263,21 @@ public enum BuiltinOperation implements Operation {
                 Atom firstArg = args.getHead();
                 assertTrue(firstArg.isList(), "first argument to let must be a list");
 
-                AtomImpl.List bindings = (AtomImpl.List) args.getHead();
+                AtomList bindings = (AtomList) args.getHead();
 
                 bindings.forEach(atom -> {
                     assertTrue(atom.isListPair(), "first argument must be a list of pairs");
-                    AtomImpl.List pair =  (AtomImpl.List) atom;
+                    AtomList pair =  (AtomList) atom;
 
                     Atom firstElem = pair.getHead();
                     assertTrue(firstElem.isIdentifier(), "pairs must be of the form (identifier, expr)");
-                    AtomImpl.Identifier id = (AtomImpl.Identifier) firstElem;
+                    AtomIdentifier id = (AtomIdentifier) firstElem;
 
                     Atom val = pair.getTail().getHead().evaluate(evaluator);
                     scope.bind(id, val);
                 });
 
-                AtomImpl.List exprs = args.getTail();
+                AtomList exprs = args.getTail();
 
                 return evaluateListAndTakeLast(evaluator, exprs);
 
@@ -288,12 +296,12 @@ public enum BuiltinOperation implements Operation {
     SET_BANG("set!") {
         
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() == 2, "set! takes exactly two arguments");
             
             Atom firstArg = args.getHead();
             assertTrue(firstArg.isIdentifier(), "first argument to set! must be an identifier");
-            AtomImpl.Identifier id = (AtomImpl.Identifier) firstArg;
+            AtomIdentifier id = (AtomIdentifier) firstArg;
             
             assertTrue(evaluator.isBound(id), "identifier must be bound to a value");
             
@@ -311,19 +319,19 @@ public enum BuiltinOperation implements Operation {
     LAMBDA("lambda") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() >= 1, "lambda takes at least one argument");
             
             Atom firstArg = args.getHead();
             assertTrue(firstArg.isList(), "first argument to lambda must be a list");
             
-            AtomImpl.List params = (AtomImpl.List) firstArg;
-            boolean allIdentifiers = params.allMatchType(AtomImpl.Identifier.class);
+            AtomList params = (AtomList) firstArg;
+            boolean allIdentifiers = params.allMatchType(AtomIdentifier.class);
             assertTrue(allIdentifiers, "first argument must be a list of identifiers");
             
-            AtomImpl.List exprs = args.getTail();
+            AtomList exprs = args.getTail();
 
-            return AtomImpl.Lambda.make(evaluator, params, exprs);
+            return AtomLambda.make(evaluator, params, exprs);
         }
         
         @Override 
@@ -336,14 +344,14 @@ public enum BuiltinOperation implements Operation {
     OR("or") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {            
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {            
             return args.stream()
                     .map(evaluator::evaluate)
                     .peek(Atom::assertIsBoolean)
-                    .map(AtomImpl.Boolean.class::cast)
-                    .filter(AtomImpl.Boolean::isTrue)
+                    .map(AtomBoolean.class::cast)
+                    .filter(AtomBoolean::isTrue)
                     .findFirst()
-                    .orElse(AtomImpl.Boolean.getFalse());
+                    .orElse(AtomBoolean.getFalse());
         }
         
         @Override 
@@ -356,15 +364,15 @@ public enum BuiltinOperation implements Operation {
     AND("and") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             
             return args.stream()
                     .map(evaluator::evaluate)
                     .peek(Atom::assertIsBoolean)
-                    .map(AtomImpl.Boolean.class::cast)
-                    .filter(AtomImpl.Boolean::isFalse)
+                    .map(AtomBoolean.class::cast)
+                    .filter(AtomBoolean::isFalse)
                     .findFirst()
-                    .orElse(AtomImpl.Boolean.getTrue());
+                    .orElse(AtomBoolean.getTrue());
         }
         
         @Override 
@@ -377,12 +385,12 @@ public enum BuiltinOperation implements Operation {
     NOT("not") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() == 1, "not takes exactly one argument");
             
             Atom firstArg = args.getHead();
             assertIsBoolean(firstArg);
-            AtomImpl.Boolean val = (AtomImpl.Boolean) firstArg;
+            AtomBoolean val = (AtomBoolean) firstArg;
             
             return val.negate();
         }
@@ -397,7 +405,7 @@ public enum BuiltinOperation implements Operation {
     LESS_THAN("<") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::lessThan);
         }
         
@@ -411,7 +419,7 @@ public enum BuiltinOperation implements Operation {
     GREATER_THAN(">") {
         
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::greaterThan);
         }
         
@@ -425,7 +433,7 @@ public enum BuiltinOperation implements Operation {
     EQUAL_INT("=") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             return applyArithmeticComparisonOperation(evaluator, args, BuiltinOperation::equalToInt);
         }
         
@@ -439,11 +447,11 @@ public enum BuiltinOperation implements Operation {
     EQUAL_ATOM("equal?") {
     
         @Override
-        public AtomImpl apply(Evaluator evaluator, AtomImpl.List args) {
+        public AtomImpl apply(Evaluator evaluator, AtomList args) {
             Atom first = args.getHead();
             Atom second = args.getTail().getHead();
             
-            return AtomImpl.Boolean.make(first.equals(second));
+            return AtomBoolean.make(first.equals(second));
         }
         
         @Override 
@@ -456,12 +464,12 @@ public enum BuiltinOperation implements Operation {
     COND("cond") {
     
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             return args.stream()
                 .filter(isConditionTrue(evaluator))
                 .findFirst()
                 .map(evaluateAndTakeSecond(evaluator))
-                .orElse(AtomImpl.Void.getInstance());
+                .orElse(AtomVoid.getInstance());
         }
         
         @Override 
@@ -474,7 +482,7 @@ public enum BuiltinOperation implements Operation {
     IF("if") {
         
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() == 3, "if takes exactly 3 arguments");
             
             Atom firstArg = args.getHead().evaluate(evaluator);
@@ -483,7 +491,7 @@ public enum BuiltinOperation implements Operation {
             Atom falseExpr = args.getTail().getTail().getHead();
             
             if (firstArg.isBoolean()) {
-                AtomImpl.Boolean test = (AtomImpl.Boolean) firstArg;
+                AtomBoolean test = (AtomBoolean) firstArg;
                 return test.isTrue() ? trueExpr.evaluate(evaluator) : falseExpr.evaluate(evaluator);
             }
             else {
@@ -495,7 +503,7 @@ public enum BuiltinOperation implements Operation {
     RAISE("raise") {
         
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
            assertTrue(args.size() == 1, "raise takes exactly one argument");
            Atom firstArg = args.getHead();
            
@@ -507,21 +515,21 @@ public enum BuiltinOperation implements Operation {
     GUARD("guard") {
         
         @Override
-        public Atom apply(Evaluator evaluator, AtomImpl.List args) {
+        public Atom apply(Evaluator evaluator, AtomList args) {
             assertTrue(args.size() >= 3, "guard takes at least 3 arguments");
             
             Atom firstArg = args.getHead();
             assertTrue(firstArg.isIdentifier(), "first argument to guard must be an identifier");
-            AtomImpl.Identifier exv = (AtomImpl.Identifier) firstArg;
+            AtomIdentifier exv = (AtomIdentifier) firstArg;
             
             Atom secondArg = args.getTail().getHead();
             assertTrue(secondArg.isList(), "second argument to guard must be a list");
             
-            AtomImpl.List handlers = (AtomImpl.List) secondArg;
+            AtomList handlers = (AtomList) secondArg;
             boolean allListPairs = handlers.stream().allMatch(pair -> pair.isListPair());
             assertTrue(allListPairs, "second argument to guard must be a list of pairs");
             
-            AtomImpl.List exprs = args.getTail().getTail();
+            AtomList exprs = args.getTail().getTail();
             
             try {
                 return evaluateListAndTakeLast(evaluator, exprs);
@@ -544,7 +552,7 @@ public enum BuiltinOperation implements Operation {
     
     private boolean lazy;
     
-    private final String token;
+    final String token;
     
     private BuiltinOperation(String token) {
         this.token = token;
@@ -566,25 +574,25 @@ public enum BuiltinOperation implements Operation {
     
     private static AtomImpl applyArithmeticOperation(
             Evaluator evaluator, 
-            AtomImpl.List args, 
+            AtomList args, 
             BinaryOperator<java.lang.Integer> op, 
             java.lang.Integer identity)
     {
         java.lang.Integer result = args.stream()
                     .map(atom -> atom.evaluate(evaluator))
                     .peek(Atom::assertIsInteger)
-                    .map(AtomImpl.Integer.class::cast)
-                    .map(AtomImpl.Integer::getValue)
+                    .map(AtomInteger.class::cast)
+                    .map(AtomInteger::getValue)
                     .reduce(op)
                     .orElse(identity);
         
-        return AtomImpl.Integer.make(result);
+        return AtomInteger.make(result);
     }
 
-    private static AtomImpl.Boolean applyArithmeticComparisonOperation(
+    private static AtomBoolean applyArithmeticComparisonOperation(
             Evaluator evaluator,
-            AtomImpl.List args,
-            BiPredicate<AtomImpl.Integer, AtomImpl.Integer> op)
+            AtomList args,
+            BiPredicate<AtomInteger, AtomInteger> op)
     {
         assertTrue(args.size() == 2, "integer comparison operation takes exactly two arguments");
         
@@ -597,43 +605,43 @@ public enum BuiltinOperation implements Operation {
         assertTrue(firstEval.isInteger(), "integer comparison requires two integers");
         assertTrue(secondEval.isInteger(), "integer comparison requires two integers");
         
-        AtomImpl.Integer firstInt = (AtomImpl.Integer) firstEval;
-        AtomImpl.Integer secondInt = (AtomImpl.Integer) secondEval;
+        AtomInteger firstInt = (AtomInteger) firstEval;
+        AtomInteger secondInt = (AtomInteger) secondEval;
         
-        return op.test(firstInt, secondInt) ? AtomImpl.Boolean.getTrue() : AtomImpl.Boolean.getFalse();
+        return op.test(firstInt, secondInt) ? AtomBoolean.getTrue() : AtomBoolean.getFalse();
     }
     
     private static Predicate<Atom> isConditionTrue(Evaluator evaluator) {
         return pair -> {
             assertTrue(pair.isListPair(), "expected a list of pairs");
-            AtomImpl.List arg = (AtomImpl.List) pair;
+            AtomList arg = (AtomList) pair;
 
             Atom expr = arg.getHead().evaluate(evaluator);
             if (!expr.isBoolean()) {
                 return true;
             }
 
-            AtomImpl.Boolean test = (AtomImpl.Boolean) expr;
+            AtomBoolean test = (AtomBoolean) expr;
             return test.isTrue();
         };
     }
 
     private static UnaryOperator<Atom> evaluateAndTakeSecond(Evaluator evaluator) {
         return pair -> {
-            AtomImpl.List arg = (AtomImpl.List) pair;
+            AtomList arg = (AtomList) pair;
             return arg.getTail().getHead().evaluate(evaluator);
         };
     }
 
-    private static boolean lessThan(AtomImpl.Integer first, AtomImpl.Integer second) {
+    private static boolean lessThan(AtomInteger first, AtomInteger second) {
         return first.getValue().compareTo(second.getValue()) < 0;
     }
     
-    private static boolean greaterThan(AtomImpl.Integer first, AtomImpl.Integer second) {
+    private static boolean greaterThan(AtomInteger first, AtomInteger second) {
         return first.getValue().compareTo(second.getValue()) > 0;
     }
     
-    private static boolean equalToInt(AtomImpl.Integer first, AtomImpl.Integer second) {
+    private static boolean equalToInt(AtomInteger first, AtomInteger second) {
         return Objects.equals(first.getValue(), second.getValue());
     }
 

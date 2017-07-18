@@ -1,10 +1,11 @@
 package schemeinterpreter.parser;
 
+import schemeinterpreter.parser.symbol.Symbol;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import schemeinterpreter.lexer.Lexer;
-import schemeinterpreter.lexer.Token;
+import schemeinterpreter.lexer.token.Token;
 
 /**
  *

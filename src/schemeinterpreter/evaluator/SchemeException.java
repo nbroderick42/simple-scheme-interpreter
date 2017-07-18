@@ -5,6 +5,8 @@
  */
 package schemeinterpreter.evaluator;
 
+import schemeinterpreter.evaluator.atom.Atom;
+
 /**
  *
  * @author nick

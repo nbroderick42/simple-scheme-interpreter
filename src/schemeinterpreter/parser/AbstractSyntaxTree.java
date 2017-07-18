@@ -1,5 +1,12 @@
 package schemeinterpreter.parser;
 
+import schemeinterpreter.parser.symbol.SymbolString;
+import schemeinterpreter.parser.symbol.SymbolIdentifier;
+import schemeinterpreter.parser.symbol.SymbolListExprs;
+import schemeinterpreter.parser.symbol.Symbol;
+import schemeinterpreter.parser.symbol.SymbolLparen;
+import schemeinterpreter.parser.symbol.SymbolInteger;
+import schemeinterpreter.parser.symbol.SymbolRparen;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -43,7 +50,7 @@ public class AbstractSyntaxTree {
             sb.append(indent).append(curr.toFormattedString()).append("\n");
         }
         else {
-            int nextDepth = depth + (curr instanceof Symbol.ListExprs ? 1 : 0);
+            int nextDepth = depth + (curr instanceof SymbolListExprs ? 1 : 0);
             curr.forEachChild(sym ->
                 buildStringRepr(sb, sym, nextDepth)
             );
@@ -55,11 +62,11 @@ public class AbstractSyntaxTree {
     }
     
     private static boolean isPrintableTerminal(Symbol s) {
-        return s instanceof Symbol.Identifier ||
-               s instanceof Symbol.Integer ||
-               s instanceof Symbol.String ||
-               s instanceof Symbol.Lparen || 
-               s instanceof Symbol.Rparen;
+        return s instanceof SymbolIdentifier ||
+               s instanceof SymbolInteger ||
+               s instanceof SymbolString ||
+               s instanceof SymbolLparen || 
+               s instanceof SymbolRparen;
     }
 
 }

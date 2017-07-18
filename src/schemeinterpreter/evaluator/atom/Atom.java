@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator;
+package schemeinterpreter.evaluator.atom;
 
+import schemeinterpreter.evaluator.Evaluator;
 import static schemeinterpreter.evaluator.Evaluator.assertTrue;
 
 /**
@@ -18,36 +19,36 @@ public interface Atom {
     public Atom evaluate(Evaluator evaluator);
 
     public default boolean isIdentifier() {
-        return this instanceof AtomImpl.Identifier;
+        return this instanceof AtomIdentifier;
     }
 
     public default boolean isString() {
-        return this instanceof AtomImpl.String;
+        return this instanceof AtomString;
     }
 
     public default boolean isInteger() {
-        return this instanceof AtomImpl.Integer;
+        return this instanceof AtomInteger;
     }
 
     public default boolean isVoid() {
-        return this instanceof AtomImpl.Void;
+        return this instanceof AtomVoid;
     }
 
     public default boolean isBoolean() {
-        return this instanceof AtomImpl.Boolean;
+        return this instanceof AtomBoolean;
     }
 
     public default boolean isList() {
-        return this instanceof AtomImpl.List;
+        return this instanceof AtomList;
     }
 
     public default boolean isOperation() {
-        return this instanceof AtomImpl.Operation;
+        return this instanceof AtomProcedure;
     }
     
     public default boolean isListPair() {
-        if (this instanceof AtomImpl.List) {
-            AtomImpl.List list = (AtomImpl.List) this;
+        if (this instanceof AtomList) {
+            AtomList list = (AtomList) this;
             return list.isPair();
         }
         
