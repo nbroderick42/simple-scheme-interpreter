@@ -5,6 +5,7 @@
  */
 package schemeinterpreter.parser.symbol;
 
+import static java.lang.String.format;
 import schemeinterpreter.lexer.token.Token;
 
 /**
@@ -12,7 +13,7 @@ import schemeinterpreter.lexer.token.Token;
  * @author nick
  */
 public class SymbolIdentifier extends Symbol {
-    
+
     private java.lang.String value;
 
     public SymbolIdentifier() {
@@ -35,7 +36,7 @@ public class SymbolIdentifier extends Symbol {
 
     @Override
     public java.lang.String toFormattedString() {
-        return java.lang.String.format("Identifier: [%s]", value);
+        return format("Identifier: [%s]", value);
     }
-    
+
 }

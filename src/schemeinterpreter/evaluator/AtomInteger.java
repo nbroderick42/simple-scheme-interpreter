@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator.atom;
+package schemeinterpreter.evaluator;
 
 import java.util.Objects;
 import schemeinterpreter.evaluator.Evaluator;
@@ -15,7 +15,7 @@ import schemeinterpreter.parser.symbol.SymbolInteger;
  * @author nick
  */
 public class AtomInteger extends AtomImpl {
-    
+
     private final java.lang.Integer val;
 
     public static AtomInteger make(SymbolInteger integer) {
@@ -52,13 +52,13 @@ public class AtomInteger extends AtomImpl {
     }
 
     @Override
-    public Atom evaluate(Evaluator evaluator) {
-        return evaluator.evaluate(this);
+    public Atom evaluate() {
+        return Evaluator.getInstance().evaluate(this);
     }
 
     @Override
     public java.lang.String toString() {
         return val.toString();
     }
-    
+
 }

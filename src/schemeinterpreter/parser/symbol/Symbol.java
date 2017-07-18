@@ -1,7 +1,7 @@
 package schemeinterpreter.parser.symbol;
 
 import java.util.function.Consumer;
-import schemeinterpreter.evaluator.atom.AtomImpl;
+import schemeinterpreter.evaluator.AtomImpl;
 import schemeinterpreter.lexer.token.Token;
 
 /**
@@ -9,30 +9,17 @@ import schemeinterpreter.lexer.token.Token;
  * @author nick
  */
 public abstract class Symbol {
-    
+
     private Symbol nextSibling, firstChild, lastChild;
-        
+
     private boolean terminal;
-    
+
     private AtomImpl eval;
-    
+
     protected Symbol() {
         this.terminal = false;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     public void addChild(Symbol s) {
         if (firstChild == null) {
             firstChild = s;
@@ -40,38 +27,39 @@ public abstract class Symbol {
         else {
             lastChild.setNextSibling(s);
         }
-        
+
         lastChild = s;
     }
-    
+
     public void setNextSibling(Symbol nextSibling) {
         this.nextSibling = nextSibling;
     }
-    
+
     public Symbol getFirstChild() {
         return firstChild;
     }
-    
+
     public Symbol getNextSibling() {
         return nextSibling;
     }
-    
+
     public void forEachChild(Consumer<Symbol> consumer) {
         for (Symbol curr = getFirstChild(); curr != null; curr = curr.getNextSibling()) {
             consumer.accept(curr);
         }
     }
-    
+
     public static Symbol makeStartSymbol() {
         return new SymbolS();
     }
 
-    public void acceptToken(Token token) {}
-    
+    public void acceptToken(Token token) {
+    }
+
     public boolean isTerminal() {
         return terminal;
     }
-    
+
     public java.lang.String toFormattedString() {
         return toString();
     }

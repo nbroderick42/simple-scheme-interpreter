@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator.atom;
-
-import schemeinterpreter.evaluator.Evaluator;
+package schemeinterpreter.evaluator;
 
 /**
  *
@@ -13,6 +11,6 @@ import schemeinterpreter.evaluator.Evaluator;
  */
 public interface AtomProcedure extends Atom {
 
-    public Atom apply(Evaluator evaluator, AtomList args);
-    
+    public Atom apply(AtomList args);
+
 }

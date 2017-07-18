@@ -3,21 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator.atom;
-
-import schemeinterpreter.evaluator.Evaluator;
+package schemeinterpreter.evaluator;
 
 /**
  *
  * @author nick
  */
 public class AtomVoid extends AtomImpl {
-    
+
     private static final AtomVoid INSTANCE = new AtomVoid();
 
     @Override
-    public AtomImpl evaluate(Evaluator evaluator) {
-        return evaluator.evaluate(this);
+    public Atom evaluate() {
+        return Evaluator.getInstance().evaluate(this);
     }
 
     public static AtomVoid getInstance() {
@@ -28,5 +26,5 @@ public class AtomVoid extends AtomImpl {
     public java.lang.String toString() {
         return "<void>";
     }
-    
+
 }

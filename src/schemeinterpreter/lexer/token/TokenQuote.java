@@ -10,7 +10,7 @@ package schemeinterpreter.lexer.token;
  * @author nick
  */
 public class TokenQuote extends Token {
-    
+
     TokenQuote() {
         super.setValue("'");
     }
@@ -18,5 +18,5 @@ public class TokenQuote extends Token {
     public static java.lang.String repr() {
         return "'";
     }
-    
+
 }

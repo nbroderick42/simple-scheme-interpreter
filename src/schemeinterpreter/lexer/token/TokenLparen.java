@@ -10,7 +10,7 @@ package schemeinterpreter.lexer.token;
  * @author nick
  */
 public class TokenLparen extends Token {
-    
+
     TokenLparen() {
         super.setValue("(");
     }
@@ -18,5 +18,5 @@ public class TokenLparen extends Token {
     public static java.lang.String repr() {
         return "(";
     }
-    
+
 }

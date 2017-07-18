@@ -10,7 +10,7 @@ package schemeinterpreter.parser.symbol;
  * @author nick
  */
 public class SymbolEOF extends Symbol {
-    
+
     public SymbolEOF() {
         super.setTerminal(true);
     }
@@ -19,5 +19,5 @@ public class SymbolEOF extends Symbol {
     public java.lang.String toString() {
         return "";
     }
-    
+
 }

@@ -10,5 +10,5 @@ package schemeinterpreter.parser.symbol;
  * @author nick
  */
 public class SymbolExpr extends Symbol {
-    
+
 }

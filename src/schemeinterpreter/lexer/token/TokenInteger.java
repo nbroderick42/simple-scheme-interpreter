@@ -10,7 +10,7 @@ package schemeinterpreter.lexer.token;
  * @author nick
  */
 public class TokenInteger extends Token {
-    
+
     TokenInteger(java.lang.String value) {
         super.setValue(value);
     }
@@ -18,5 +18,5 @@ public class TokenInteger extends Token {
     public static java.lang.String repr() {
         return "[integer]";
     }
-    
+
 }

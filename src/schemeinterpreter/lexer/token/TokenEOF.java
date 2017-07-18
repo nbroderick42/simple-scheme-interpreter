@@ -10,7 +10,7 @@ package schemeinterpreter.lexer.token;
  * @author nick
  */
 public class TokenEOF extends Token {
-    
+
     TokenEOF() {
         super.setValue("EOF");
     }
@@ -18,5 +18,5 @@ public class TokenEOF extends Token {
     public static java.lang.String repr() {
         return "[eof]";
     }
-    
+
 }

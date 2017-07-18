@@ -5,43 +5,43 @@
  */
 package schemeinterpreter.evaluator;
 
-import schemeinterpreter.evaluator.atom.Atom;
-import schemeinterpreter.evaluator.atom.AtomIdentifier;
 import java.util.Collections;
+import static java.util.Collections.unmodifiableMap;
 import java.util.HashMap;
 import java.util.Map;
+import static schemeinterpreter.evaluator.AtomIdentifier.make;
 
 /**
  *
  * @author nick
  */
 public class Frame {
-    
+
     private Frame parent;
-    
+
     private final Map<AtomIdentifier, Atom> table;
-    
+
     private Frame(Frame parent) {
         this.parent = parent;
         this.table = new HashMap<>();
     }
-    
+
     public static Frame makeGlobalFrame() {
         return new Frame(null);
     }
-    
+
     public void bind(AtomIdentifier id, Atom val) {
         table.put(id, val);
     }
-    
+
     public void bind(String identifier, Atom val) {
-        table.put(AtomIdentifier.make(identifier), val);
+        table.put(make(identifier), val);
     }
-    
+
     public void bind(Map.Entry<AtomIdentifier, Atom> entry) {
         table.put(entry.getKey(), entry.getValue());
     }
-    
+
     public Atom resolve(AtomIdentifier id) {
         for (Frame curr = this; curr != null; curr = curr.getParent()) {
             if (curr.getTable().containsKey(id)) {
@@ -50,23 +50,23 @@ public class Frame {
         }
         return null;
     }
-    
+
     public boolean isBound(AtomIdentifier id) {
         return resolve(id) != null;
     }
-    
+
     public Frame getParent() {
         return parent;
     }
-    
+
     private Map<AtomIdentifier, Atom> getTable() {
-        return Collections.unmodifiableMap(table);
+        return unmodifiableMap(table);
     }
 
     public Frame attachNewFrame() {
         return new Frame(this);
     }
-    
+
     public Frame detachFrame() {
         Frame parentFrame = this.parent;
         this.parent = null;

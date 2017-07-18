@@ -10,7 +10,7 @@ package schemeinterpreter.parser.symbol;
  * @author nick
  */
 public class SymbolRparen extends Symbol {
-    
+
     public SymbolRparen() {
         super.setTerminal(true);
     }
@@ -19,5 +19,5 @@ public class SymbolRparen extends Symbol {
     public java.lang.String toString() {
         return ")";
     }
-    
+
 }

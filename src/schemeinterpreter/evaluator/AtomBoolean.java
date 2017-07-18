@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator.atom;
+package schemeinterpreter.evaluator;
 
 import java.util.Objects;
 import schemeinterpreter.evaluator.Evaluator;
-import schemeinterpreter.parser.symbol.Symbol;
 import schemeinterpreter.parser.symbol.SymbolBoolean;
 
 /**
@@ -15,7 +14,7 @@ import schemeinterpreter.parser.symbol.SymbolBoolean;
  * @author nick
  */
 public class AtomBoolean extends AtomImpl {
-    
+
     private static final AtomBoolean FALSE = new AtomBoolean();
     private static final AtomBoolean TRUE = new AtomBoolean();
 
@@ -32,8 +31,8 @@ public class AtomBoolean extends AtomImpl {
     }
 
     @Override
-    public AtomImpl evaluate(Evaluator evaluator) {
-        return evaluator.evaluate(this);
+    public Atom evaluate() {
+        return Evaluator.getInstance().evaluate(this);
     }
 
     public boolean isTrue() {
@@ -77,5 +76,5 @@ public class AtomBoolean extends AtomImpl {
             return Objects.hashCode(false) ^ super.hashCode();
         }
     }
-    
+
 }

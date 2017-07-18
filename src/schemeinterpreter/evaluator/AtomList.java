@@ -3,13 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator.atom;
+package schemeinterpreter.evaluator;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
+import static java.util.stream.Collector.of;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.joining;
 import java.util.stream.Stream;
+import static java.util.stream.Stream.builder;
 import schemeinterpreter.evaluator.Evaluator;
 
 /**
@@ -17,7 +20,7 @@ import schemeinterpreter.evaluator.Evaluator;
  * @author nick
  */
 public class AtomList extends AtomImpl {
-    
+
     private java.lang.Integer size;
 
     private class Node {
@@ -41,7 +44,7 @@ public class AtomList extends AtomImpl {
             return atom;
         }
     }
-    
+
     private Node first;
     private Node last;
 
@@ -106,8 +109,8 @@ public class AtomList extends AtomImpl {
     }
 
     @Override
-    public Atom evaluate(Evaluator evaluator) {
-        return evaluator.evaluate(this);
+    public Atom evaluate() {
+        return Evaluator.getInstance().evaluate(this);
     }
 
     public boolean isEmpty() {
@@ -121,19 +124,19 @@ public class AtomList extends AtomImpl {
     }
 
     public Stream<Atom> stream() {
-        Stream.Builder<Atom> builder = Stream.builder();
+        Stream.Builder<Atom> builder = builder();
         forEach(builder::add);
         return builder.build();
     }
 
     public static Collector<Atom, ?, AtomList> toAtomList() {
-        return Collector.of(AtomList::new, AtomList::append, 
+        return of(AtomList::new, AtomList::append,
                 AtomList::merge, new Collector.Characteristics[]{});
     }
 
     @Override
     public java.lang.String toString() {
-        return stream().map(Atom::toString).collect(Collectors.joining(" ", "( ", " )"));
+        return stream().map(Atom::toString).collect(joining(" ", "( ", " )"));
     }
 
     @Override
@@ -157,7 +160,7 @@ public class AtomList extends AtomImpl {
 
     @Override
     public int hashCode() {
-        return stream().mapToInt((schemeinterpreter.evaluator.atom.Atom node) -> Objects.hashCode(node)).reduce(3, (result, hash) -> 83 * result + hash);
+        return stream().mapToInt((schemeinterpreter.evaluator.Atom node) -> Objects.hashCode(node)).reduce(3, (result, hash) -> 83 * result + hash);
     }
 
     public int size() {
@@ -189,5 +192,5 @@ public class AtomList extends AtomImpl {
     public boolean allMatchType(Class<? extends Atom> type) {
         return stream().allMatch(type::isInstance);
     }
-    
+
 }
