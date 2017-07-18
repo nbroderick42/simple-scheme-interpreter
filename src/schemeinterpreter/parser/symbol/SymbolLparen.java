@@ -16,7 +16,7 @@ public class SymbolLparen extends Symbol {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "(";
     }
 

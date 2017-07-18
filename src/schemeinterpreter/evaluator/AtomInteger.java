@@ -16,17 +16,17 @@ import schemeinterpreter.parser.symbol.SymbolInteger;
  */
 public class AtomInteger extends AtomImpl {
 
-    private final java.lang.Integer val;
+    private final Integer val;
 
     public static AtomInteger make(SymbolInteger integer) {
         return new AtomInteger(integer.getValue());
     }
 
-    public static AtomInteger make(java.lang.Integer integer) {
+    public static AtomInteger make(Integer integer) {
         return new AtomInteger(integer);
     }
 
-    private AtomInteger(java.lang.Integer val) {
+    private AtomInteger(Integer val) {
         this.val = val;
     }
 
@@ -47,7 +47,7 @@ public class AtomInteger extends AtomImpl {
         return hash;
     }
 
-    public java.lang.Integer getValue() {
+    public Integer getValue() {
         return val;
     }
 
@@ -57,7 +57,7 @@ public class AtomInteger extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return val.toString();
     }
 

@@ -15,7 +15,7 @@ public class TokenRparen extends Token {
         super.setValue(")");
     }
 
-    public static java.lang.String repr() {
+    public static String repr() {
         return ")";
     }
 

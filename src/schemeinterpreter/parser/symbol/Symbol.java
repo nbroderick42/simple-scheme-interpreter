@@ -60,7 +60,7 @@ public abstract class Symbol {
         return terminal;
     }
 
-    public java.lang.String toFormattedString() {
+    public String toFormattedString() {
         return toString();
     }
 

@@ -16,7 +16,7 @@ public class SymbolQuote extends Symbol {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "'";
     }
 

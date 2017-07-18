@@ -23,7 +23,7 @@ public class AtomVoid extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "<void>";
     }
 

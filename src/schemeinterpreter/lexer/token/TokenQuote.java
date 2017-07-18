@@ -15,7 +15,7 @@ public class TokenQuote extends Token {
         super.setValue("'");
     }
 
-    public static java.lang.String repr() {
+    public static String repr() {
         return "'";
     }
 

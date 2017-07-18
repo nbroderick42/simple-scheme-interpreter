@@ -5,8 +5,6 @@
  */
 package schemeinterpreter;
 
-import static java.lang.System.exit;
-import static java.lang.System.out;
 import java.nio.file.Path;
 import static java.nio.file.Paths.get;
 import schemeinterpreter.evaluator.EvaluationException;
@@ -27,7 +25,7 @@ public class SchemeInterpreter {
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
             printUsage();
-            exit(1);
+            System.exit(1);
         }
 
         Path pathToFile = get(args[0]);
@@ -39,13 +37,13 @@ public class SchemeInterpreter {
             Evaluator.evaluate(ast);
         }
         catch (EvaluationException re) {
-            out.println(re.getMessage());
+            System.out.println(re.getMessage());
         }
 
     }
 
     private static void printUsage() {
-        out.println("Must supply filename of Scheme code to parse");
+        System.out.println("Must supply filename of Scheme code to parse");
     }
 
 }

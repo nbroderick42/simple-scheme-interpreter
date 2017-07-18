@@ -21,7 +21,7 @@ import schemeinterpreter.evaluator.Evaluator;
  */
 public class AtomList extends AtomImpl {
 
-    private java.lang.Integer size;
+    private Integer size;
 
     private class Node {
 
@@ -135,7 +135,7 @@ public class AtomList extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return stream().map(Atom::toString).collect(joining(" ", "( ", " )"));
     }
 

@@ -3,17 +3,10 @@ package schemeinterpreter.lexer;
 import schemeinterpreter.lexer.token.Token;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import static java.lang.Character.isDigit;
-import static java.lang.Character.isDigit;
-import static java.lang.Character.isLetter;
-import static java.lang.Character.isWhitespace;
-import static java.lang.String.format;
-import java.nio.file.Files;
 import static java.nio.file.Files.newBufferedReader;
 import java.nio.file.Path;
 import java.util.function.Predicate;
+import schemeinterpreter.SchemeInterpreterException;
 
 /**
  * The main class used for lexical analysis of a Scheme program.
@@ -126,7 +119,7 @@ public class Lexer {
          * Advance the current character to the next possible token, past
          * any whitespace
          */
-        while (currChar != -1 && isWhitespace(currChar)) {
+        while (currChar != -1 && Character.isWhitespace(currChar)) {
             scanNextChar();
         }
 
@@ -158,7 +151,7 @@ public class Lexer {
             currentToken = makeIdentifier();
         }
         else {
-            String message = format(
+            String message = String.format(
                     "Syntax error: Unexpected character '%s' in program", currChar);
             throw new RuntimeException(message);
         }
@@ -289,7 +282,7 @@ public class Lexer {
         while (length <= MAX_TOKEN_LENGTH && isValidChar.test(currChar));
 
         if (length > MAX_TOKEN_LENGTH) {
-            String message = format(
+            String message = String.format(
                     "Syntax error: Encountered token longer than %s characters", MAX_TOKEN_LENGTH);
             throw new RuntimeException(message);
         }
@@ -351,8 +344,8 @@ public class Lexer {
     private static boolean isIdentifierChar(int c) {
         return isNotNewlineOrEOF(c)
                 && (isExtendedChar(c)
-                || isLetter(c)
-                || isDigit(c));
+                || Character.isLetter(c)
+                || Character.isDigit(c));
     }
 
     /**
@@ -364,7 +357,7 @@ public class Lexer {
      * @return True if the character may belong to an IDENTIFIER, false otherwise.
      */
     private static boolean isIntegerChar(int c) {
-        return isDigit(c);
+        return Character.isDigit(c);
     }
 
 }

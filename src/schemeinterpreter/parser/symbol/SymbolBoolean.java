@@ -5,7 +5,6 @@
  */
 package schemeinterpreter.parser.symbol;
 
-import static java.lang.String.format;
 import schemeinterpreter.lexer.token.Token;
 
 /**
@@ -14,7 +13,7 @@ import schemeinterpreter.lexer.token.Token;
  */
 public class SymbolBoolean extends Symbol {
 
-    private java.lang.Boolean value;
+    private Boolean value;
 
     public SymbolBoolean() {
         super.setTerminal(true);
@@ -22,7 +21,7 @@ public class SymbolBoolean extends Symbol {
 
     @Override
     public void acceptToken(Token token) {
-        java.lang.String tokenValue = token.getValue();
+        String tokenValue = token.getValue();
         switch (tokenValue) {
             case "#t":
                 this.value = true;
@@ -31,22 +30,22 @@ public class SymbolBoolean extends Symbol {
                 this.value = false;
                 break;
             default:
-                java.lang.String message = format("`%s' is not a valid boolean", tokenValue);
+                String message = String.format("`%s' is not a valid boolean", tokenValue);
                 throw new RuntimeException(message);
         }
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return value.toString();
     }
 
     @Override
-    public java.lang.String toFormattedString() {
-        return format("String: [%s]", value);
+    public String toFormattedString() {
+        return String.format("String: [%s]", value);
     }
 
-    public java.lang.Boolean getValue() {
+    public Boolean getValue() {
         return value;
     }
 

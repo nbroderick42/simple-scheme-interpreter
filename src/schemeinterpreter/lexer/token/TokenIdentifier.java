@@ -11,11 +11,11 @@ package schemeinterpreter.lexer.token;
  */
 public class TokenIdentifier extends Token {
 
-    TokenIdentifier(java.lang.String value) {
+    TokenIdentifier(String value) {
         super.setValue(value);
     }
 
-    public static java.lang.String repr() {
+    public static String repr() {
         return "[identifier]";
     }
 

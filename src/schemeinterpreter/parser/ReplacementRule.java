@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import schemeinterpreter.evaluator.AtomBoolean;
 import static java.util.stream.Collectors.toList;
-import schemeinterpreter.evaluator.AtomImpl;
 import schemeinterpreter.evaluator.AtomList;
 import schemeinterpreter.evaluator.AtomIdentifier;
 import schemeinterpreter.evaluator.AtomInteger;

@@ -52,7 +52,7 @@ public class AtomBoolean extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return isTrue() ? "#t" : "#f";
     }
 

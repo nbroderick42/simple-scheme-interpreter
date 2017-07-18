@@ -1,7 +1,5 @@
 package schemeinterpreter.lexer.token;
 
-import static java.lang.String.format;
-
 /**
  * The definition for the Token and its subtypes. Tokens are produced by the
  * Lexer when analyzing the input source file.
@@ -13,7 +11,7 @@ public abstract class Token {
     /**
      * The internal value for each token. Need only be set for
      */
-    private java.lang.String value;
+    private String value;
 
     /**
      * Static factory method that creates an LPAREN token
@@ -48,7 +46,7 @@ public abstract class Token {
      * @param value the value to set
      * @return an STRING Token
      */
-    public static TokenString makeString(java.lang.String value) {
+    public static TokenString makeString(String value) {
         return new TokenString(value);
     }
 
@@ -58,7 +56,7 @@ public abstract class Token {
      * @param value the value to set
      * @return an IDENTIFIER Token
      */
-    public static TokenIdentifier makeIdentifier(java.lang.String value) {
+    public static TokenIdentifier makeIdentifier(String value) {
         return new TokenIdentifier(value);
     }
 
@@ -68,11 +66,11 @@ public abstract class Token {
      * @param value the value to set
      * @return an INTEGER Token
      */
-    public static TokenInteger makeInteger(java.lang.String value) {
+    public static TokenInteger makeInteger(String value) {
         return new TokenInteger(value);
     }
 
-    public static TokenBoolean makeBoolean(java.lang.String value) {
+    public static TokenBoolean makeBoolean(String value) {
         return new TokenBoolean(value);
     }
 
@@ -90,19 +88,19 @@ public abstract class Token {
      *
      * @return The underlying value as a String
      */
-    public java.lang.String getValue() {
+    public String getValue() {
         return value;
     }
 
     @Override
-    public java.lang.String toString() {
-        return format("( %s, %s )", getClass(), getValue());
+    public String toString() {
+        return String.format("( %s, %s )", getClass(), getValue());
     }
 
     /**
      * @param value the value to set
      */
-    public void setValue(java.lang.String value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }

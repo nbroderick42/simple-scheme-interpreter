@@ -5,8 +5,6 @@
  */
 package schemeinterpreter.parser.symbol;
 
-import static java.lang.Integer.valueOf;
-import static java.lang.String.format;
 import schemeinterpreter.lexer.token.Token;
 
 /**
@@ -15,7 +13,7 @@ import schemeinterpreter.lexer.token.Token;
  */
 public class SymbolInteger extends Symbol {
 
-    private java.lang.Integer value;
+    private Integer value;
 
     public SymbolInteger() {
         super.setTerminal(true);
@@ -23,20 +21,20 @@ public class SymbolInteger extends Symbol {
 
     @Override
     public void acceptToken(Token token) {
-        this.value = valueOf(token.getValue());
+        this.value = Integer.valueOf(token.getValue());
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return value.toString();
     }
 
     @Override
-    public java.lang.String toFormattedString() {
-        return format("Integer: [%d]", value);
+    public String toFormattedString() {
+        return String.format("Integer: [%d]", value);
     }
 
-    public java.lang.Integer getValue() {
+    public Integer getValue() {
         return value;
     }
 

@@ -74,7 +74,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin DIVIDE>";
         }
 
@@ -100,7 +100,6 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
     },
-
     CAR("car") {
 
         @Override
@@ -154,7 +153,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin LIST>";
         }
 
@@ -179,7 +178,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin DEFINE>";
         }
 
@@ -226,7 +225,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin LET>";
         }
 
@@ -331,7 +330,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin OR>";
         }
 
@@ -351,7 +350,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin AND>";
         }
 
@@ -409,7 +408,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin EQUAL_INT>";
         }
 
@@ -442,7 +441,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "<builtin COND>";
         }
 
@@ -519,7 +518,7 @@ public enum BuiltinProcedure implements AtomProcedure {
 
     private boolean lazy;
 
-    final String token;
+    private final String token;
 
     private BuiltinProcedure(String token) {
         this.token = token;
@@ -539,7 +538,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         return Evaluator.evaluate(this);
     }
 
-    private static AtomImpl applyArithmeticOperation(
+    private static AtomInteger applyArithmeticOperation(
             AtomList args,
             BinaryOperator<Integer> op,
             Integer identity) 

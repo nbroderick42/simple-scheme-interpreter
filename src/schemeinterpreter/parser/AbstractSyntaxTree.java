@@ -8,9 +8,7 @@ import schemeinterpreter.parser.symbol.SymbolLparen;
 import schemeinterpreter.parser.symbol.SymbolInteger;
 import schemeinterpreter.parser.symbol.SymbolRparen;
 import java.io.IOException;
-import static java.lang.String.join;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import static java.util.Collections.nCopies;
 
 /**
@@ -59,7 +57,7 @@ public class AbstractSyntaxTree {
     }
 
     private static String makeIndent(int depth) {
-        return join("", nCopies(depth * SPACES_PER_INDENT, " "));
+        return String.join("", nCopies(depth * SPACES_PER_INDENT, " "));
     }
 
     private static boolean isPrintableTerminal(Symbol s) {

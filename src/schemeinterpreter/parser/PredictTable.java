@@ -1,6 +1,6 @@
 package schemeinterpreter.parser;
 
-import static java.lang.String.format;
+import java.lang.reflect.InvocationTargetException;
 import schemeinterpreter.parser.symbol.SymbolString;
 import schemeinterpreter.parser.symbol.SymbolQuote;
 import schemeinterpreter.parser.symbol.SymbolListExprs;
@@ -15,7 +15,6 @@ import schemeinterpreter.parser.symbol.SymbolS;
 import schemeinterpreter.parser.symbol.Symbol;
 import schemeinterpreter.parser.symbol.SymbolBoolean;
 import schemeinterpreter.parser.symbol.SymbolInteger;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -156,7 +155,7 @@ public class PredictTable {
 
         for (Class<? extends Token> tokenType : tokenTypes) {
             String repr = (String) tokenType.getMethod("repr").invoke(null);
-            tokenReprs.add(format("`%s`", repr));
+            tokenReprs.add(String.format("`%s`", repr));
         }
 
         return tokenReprs.stream().collect(joining(", "));
@@ -170,7 +169,7 @@ public class PredictTable {
         String expectedTokens = expectedTokens(sType);
         String actualToken = tType.getSimpleName();
         String message
-                = format("Syntax error: encountered `%s`, "
+                = String.format("Syntax error: encountered `%s`, "
                         + "expected one of %s.", actualToken, expectedTokens);
 
         return new SchemeInterpreterException(message);

@@ -11,11 +11,11 @@ package schemeinterpreter.lexer.token;
  */
 public class TokenBoolean extends Token {
 
-    TokenBoolean(java.lang.String value) {
+    TokenBoolean(String value) {
         super.setValue(value);
     }
 
-    public static java.lang.String repr() {
+    public static String repr() {
         return "[boolean]";
     }
 

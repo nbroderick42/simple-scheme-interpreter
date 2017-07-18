@@ -15,7 +15,7 @@ public class TokenEOF extends Token {
         super.setValue("EOF");
     }
 
-    public static java.lang.String repr() {
+    public static String repr() {
         return "[eof]";
     }
 

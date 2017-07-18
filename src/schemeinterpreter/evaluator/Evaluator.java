@@ -5,7 +5,6 @@
  */
 package schemeinterpreter.evaluator;
 
-import static java.lang.System.out;
 import java.util.Map;
 import java.util.function.Function;
 import static schemeinterpreter.evaluator.BuiltinProcedure.values;
@@ -40,7 +39,7 @@ public class Evaluator {
         AtomList atoms = (AtomList) ast.getRoot().getEval();
         atoms.forEach(atom -> {
             Atom eval = atom.evaluate();
-            out.println("=> " + eval);
+            System.out.println("=> " + eval);
         });
     }
 

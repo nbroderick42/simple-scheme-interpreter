@@ -16,9 +16,9 @@ import schemeinterpreter.parser.symbol.SymbolIdentifier;
  */
 public class AtomIdentifier extends AtomImpl {
 
-    private final java.lang.String val;
+    private final String val;
 
-    private AtomIdentifier(java.lang.String val) {
+    private AtomIdentifier(String val) {
         this.val = val;
     }
 
@@ -26,7 +26,7 @@ public class AtomIdentifier extends AtomImpl {
         return new AtomIdentifier(val.getValue());
     }
 
-    public static AtomIdentifier make(java.lang.String val) {
+    public static AtomIdentifier make(String val) {
         return new AtomIdentifier(val);
     }
 
@@ -47,7 +47,7 @@ public class AtomIdentifier extends AtomImpl {
         return hash;
     }
 
-    public java.lang.String getValue() {
+    public String getValue() {
         return val;
     }
 
@@ -57,7 +57,7 @@ public class AtomIdentifier extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return val;
     }
 

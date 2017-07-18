@@ -61,7 +61,7 @@ public class AtomLambda extends AtomImpl implements AtomProcedure {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "<lambda>";
     }
 

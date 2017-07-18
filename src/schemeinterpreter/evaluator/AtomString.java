@@ -16,9 +16,9 @@ import schemeinterpreter.parser.symbol.SymbolString;
  */
 public class AtomString extends AtomImpl {
 
-    private final java.lang.String val;
+    private final String val;
 
-    public AtomString(java.lang.String val) {
+    public AtomString(String val) {
         this.val = val;
     }
 
@@ -26,7 +26,7 @@ public class AtomString extends AtomImpl {
         return new AtomString(string.getValue());
     }
 
-    public java.lang.String getValue() {
+    public String getValue() {
         return val;
     }
 
@@ -53,7 +53,7 @@ public class AtomString extends AtomImpl {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return val;
     }
 

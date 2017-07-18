@@ -5,7 +5,6 @@
  */
 package schemeinterpreter.parser.symbol;
 
-import static java.lang.String.format;
 import schemeinterpreter.lexer.token.Token;
 
 /**
@@ -14,7 +13,7 @@ import schemeinterpreter.lexer.token.Token;
  */
 public class SymbolString extends Symbol {
 
-    private java.lang.String value;
+    private String value;
 
     public SymbolString() {
         super.setTerminal(true);
@@ -26,16 +25,16 @@ public class SymbolString extends Symbol {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return value;
     }
 
     @Override
-    public java.lang.String toFormattedString() {
-        return format("String: [%s]", value);
+    public String toFormattedString() {
+        return String.format("String: [%s]", value);
     }
 
-    public java.lang.String getValue() {
+    public String getValue() {
         return value;
     }
 
