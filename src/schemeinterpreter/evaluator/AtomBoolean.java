@@ -6,7 +6,6 @@
 package schemeinterpreter.evaluator;
 
 import java.util.Objects;
-import schemeinterpreter.evaluator.Evaluator;
 import schemeinterpreter.parser.symbol.SymbolBoolean;
 
 /**
@@ -32,7 +31,7 @@ public class AtomBoolean extends AtomImpl {
 
     @Override
     public Atom evaluate() {
-        return Evaluator.getInstance().evaluate(this);
+        return Evaluator.evaluate(this);
     }
 
     public boolean isTrue() {

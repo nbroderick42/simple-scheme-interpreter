@@ -7,7 +7,6 @@ package schemeinterpreter.evaluator;
 
 import java.util.function.Function;
 import static schemeinterpreter.evaluator.Evaluator.evaluateInScope;
-import static schemeinterpreter.evaluator.Evaluator.evaluate;
 
 /**
  *

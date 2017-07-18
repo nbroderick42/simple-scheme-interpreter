@@ -5,7 +5,6 @@
  */
 package schemeinterpreter.evaluator;
 
-import java.util.Collections;
 import static java.util.Collections.unmodifiableMap;
 import java.util.HashMap;
 import java.util.Map;
