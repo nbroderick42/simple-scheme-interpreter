@@ -6,7 +6,6 @@
 package schemeinterpreter.evaluator;
 
 import java.util.Objects;
-import schemeinterpreter.evaluator.Evaluator;
 import schemeinterpreter.parser.symbol.SymbolIdentifier;
 
 /**
@@ -15,18 +14,18 @@ import schemeinterpreter.parser.symbol.SymbolIdentifier;
  */
 public class AtomIdentifier extends AtomImpl {
 
-    private final String val;
-
-    private AtomIdentifier(String val) {
-        this.val = val;
-    }
-
     public static AtomIdentifier make(SymbolIdentifier val) {
         return new AtomIdentifier(val.getValue());
     }
 
     public static AtomIdentifier make(String val) {
         return new AtomIdentifier(val);
+    }
+    
+    private final String val;
+    
+    private AtomIdentifier(String val) {
+        this.val = val;
     }
 
     @Override

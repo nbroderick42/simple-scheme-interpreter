@@ -13,6 +13,20 @@ import static schemeinterpreter.evaluator.Evaluator.evaluateInScope;
  * @author nick
  */
 public class AtomLambda extends AtomImpl implements AtomProcedure {
+    
+    public static AtomLambda make(Frame closingFrame, AtomList params, AtomList exprs) {
+        return new AtomLambda(closingFrame, params, exprs);
+    }
+    
+    public static Atom evaluateListAndTakeLast(AtomList exprs) {
+        return exprs.stream()
+                .map((atom) -> atom.evaluate())
+                .reduce(AtomVoid.getInstance(), AtomLambda::takeLast);
+    }
+    
+    private static Atom takeLast(Atom first, Atom second) {
+        return second;
+    }
 
     private Frame closingFrame;
     private AtomList params;
@@ -27,9 +41,6 @@ public class AtomLambda extends AtomImpl implements AtomProcedure {
         this.exprs = exprs;
     }
 
-    public static AtomLambda make(Frame closingFrame, AtomList params, AtomList exprs) {
-        return new AtomLambda(closingFrame, params, exprs);
-    }
 
     @Override
     public Atom evaluate() {
@@ -53,19 +64,11 @@ public class AtomLambda extends AtomImpl implements AtomProcedure {
         return evaluateInScope(closingFrame, impl);
     }
 
-    public static Atom evaluateListAndTakeLast(AtomList exprs) {
-        return exprs.stream()
-                .map((atom) -> atom.evaluate())
-                .reduce(AtomVoid.getInstance(), AtomLambda::takeLast);
-    }
 
     @Override
     public String toString() {
         return "<lambda>";
     }
 
-    private static Atom takeLast(Atom first, Atom second) {
-        return second;
-    }
 
 }

@@ -16,8 +16,6 @@ import schemeinterpreter.parser.AbstractSyntaxTree;
  */
 public class Evaluator {
 
-    private Frame currentFrame;
-
     private static Evaluator INSTANCE;
     
     public static Evaluator getInstance() {
@@ -27,21 +25,10 @@ public class Evaluator {
         return INSTANCE;
     }
     
-    private Evaluator() {
-        this.currentFrame = makeGlobalFrame();
-    }
-
     public static void evaluate(AbstractSyntaxTree ast) {
         getInstance().evaluateImpl(ast);
     }
     
-    private void evaluateImpl(AbstractSyntaxTree ast) {
-        AtomList atoms = (AtomList) ast.getRoot().getEval();
-        atoms.forEach(atom -> {
-            Atom eval = atom.evaluate();
-            System.out.println("=> " + eval);
-        });
-    }
 
     static Atom evaluate(Atom atom) {
         return atom.evaluate();
@@ -51,14 +38,6 @@ public class Evaluator {
         return getInstance().evaluateImpl(id);
     }
     
-    private Atom evaluateImpl(AtomIdentifier id) {
-        if (id.isLazy()) {
-            return id;
-        }
-        else {
-            return currentFrame.resolve(id);
-        }
-    }
 
     static Atom evaluate(AtomInteger integer) {
         return integer;
@@ -102,28 +81,11 @@ public class Evaluator {
         return getInstance().evaluateInLocalScopeImpl(callback);
     }
     
-    private Atom evaluateInLocalScopeImpl(Function<Frame, Atom> callback) {
-        currentFrame = currentFrame.attachNewFrame();
-        Atom result = callback.apply(currentFrame);
-        currentFrame = currentFrame.getParent();
-
-        return result;
-    }
 
     static Atom evaluateInScope(Frame scope, Function<Frame, Atom> callback) {
         return getInstance().evaluateInScopeImpl(scope, callback);
     }
     
-    private Atom evaluateInScopeImpl(Frame scope, Function<Frame, Atom> callback) {
-        Frame prevFrame = currentFrame;
-        currentFrame = scope;
-
-        Atom result = callback.apply(scope);
-
-        currentFrame = prevFrame;
-
-        return result;
-    }
 
     static void bindToCurrentFrame(AtomIdentifier id, Atom value) {
         getInstance().bindToCurrentFrameImpl(id, value);
@@ -133,47 +95,21 @@ public class Evaluator {
         getInstance().bindToCurrentFrameImpl(entry);
     }
     
-    private void bindToCurrentFrameImpl(AtomIdentifier id, Atom value) {
-        currentFrame.bind(id, value);
-    }
-    
-    private void bindToCurrentFrameImpl(Map.Entry<AtomIdentifier, Atom> entry) {
-        currentFrame.bind(entry.getKey(), entry.getValue());
-    }
     
     static Frame getCurrentFrame() {
         return getInstance().getCurrentFrameImpl();
     }
     
-    private Frame getCurrentFrameImpl() {
-        return currentFrame;
-    }
-
-    private Frame makeGlobalFrame() {
-        Frame globalFrame = Frame.makeGlobalFrame();
-
-        for (BuiltinProcedure op : values()) {
-            globalFrame.bind(op.getToken(), op);
-        }
-
-        return globalFrame;
-    }
 
     static boolean isBound(AtomIdentifier id) {
         return getInstance().isBoundImpl(id);
     }
     
-    private boolean isBoundImpl(AtomIdentifier id) {
-        return currentFrame.isBound(id);
-    }
 
     static Atom resolve(AtomIdentifier id) {
         return getInstance().resolveImpl(id);
     }
     
-    private Atom resolveImpl(AtomIdentifier id) {
-        return currentFrame.resolve(id);
-    }
     
     static boolean isConditionTrue(Atom pair) {
             assertTrue(pair.isListPair(), "expected pair of atoms");
@@ -199,6 +135,78 @@ public class Evaluator {
         if (!test) {
             throw new EvaluationException(message);
         }
+    }
+    
+    private Frame currentFrame;
+    
+    private Evaluator() {
+        this.currentFrame = makeGlobalFrame();
+    }
+    
+    private void evaluateImpl(AbstractSyntaxTree ast) {
+        AtomList atoms = (AtomList) ast.getRoot().getEval();
+        atoms.forEach(atom -> {
+            Atom eval = atom.evaluate();
+            System.out.println("=> " + eval);
+        });
+    }
+    
+    private Atom evaluateImpl(AtomIdentifier id) {
+        if (id.isLazy()) {
+            return id;
+        }
+        else {
+            return currentFrame.resolve(id);
+        }
+    }
+    
+    private Atom evaluateInLocalScopeImpl(Function<Frame, Atom> callback) {
+        currentFrame = currentFrame.attachNewFrame();
+        Atom result = callback.apply(currentFrame);
+        currentFrame = currentFrame.getParent();
+        
+        return result;
+    }
+    
+    private Atom evaluateInScopeImpl(Frame scope, Function<Frame, Atom> callback) {
+        Frame prevFrame = currentFrame;
+        currentFrame = scope;
+        
+        Atom result = callback.apply(scope);
+        
+        currentFrame = prevFrame;
+        
+        return result;
+    }
+    
+    private void bindToCurrentFrameImpl(AtomIdentifier id, Atom value) {
+        currentFrame.bind(id, value);
+    }
+    
+    private void bindToCurrentFrameImpl(Map.Entry<AtomIdentifier, Atom> entry) {
+        currentFrame.bind(entry.getKey(), entry.getValue());
+    }
+    
+    private Frame getCurrentFrameImpl() {
+        return currentFrame;
+    }
+    
+    private Frame makeGlobalFrame() {
+        Frame globalFrame = Frame.makeGlobalFrame();
+        
+        for (BuiltinProcedure op : values()) {
+            globalFrame.bind(op.getToken(), op);
+        }
+        
+        return globalFrame;
+    }
+    
+    private boolean isBoundImpl(AtomIdentifier id) {
+        return currentFrame.isBound(id);
+    }
+    
+    private Atom resolveImpl(AtomIdentifier id) {
+        return currentFrame.resolve(id);
     }
 
 }

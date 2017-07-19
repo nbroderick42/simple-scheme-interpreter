@@ -6,7 +6,6 @@
 package schemeinterpreter.evaluator;
 
 import java.util.Objects;
-import schemeinterpreter.evaluator.Evaluator;
 import schemeinterpreter.parser.symbol.SymbolString;
 
 /**
@@ -14,15 +13,15 @@ import schemeinterpreter.parser.symbol.SymbolString;
  * @author nick
  */
 public class AtomString extends AtomImpl {
+    
+    public static AtomString make(SymbolString string) {
+        return new AtomString(string.getValue());
+    }
 
     private final String val;
 
     public AtomString(String val) {
         this.val = val;
-    }
-
-    public static AtomString make(SymbolString string) {
-        return new AtomString(string.getValue());
     }
 
     public String getValue() {
@@ -48,7 +47,7 @@ public class AtomString extends AtomImpl {
 
     @Override
     public Atom evaluate() {
-        return Evaluator.getInstance().evaluate(this);
+        return Evaluator.evaluate(this);
     }
 
     @Override

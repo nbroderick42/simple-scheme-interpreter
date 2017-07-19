@@ -20,15 +20,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import schemeinterpreter.SchemeInterpreterException;
-import schemeinterpreter.lexer.token.Token;
-import schemeinterpreter.lexer.token.TokenBoolean;
-import schemeinterpreter.lexer.token.TokenEOF;
-import schemeinterpreter.lexer.token.TokenIdentifier;
-import schemeinterpreter.lexer.token.TokenInteger;
-import schemeinterpreter.lexer.token.TokenLparen;
-import schemeinterpreter.lexer.token.TokenQuote;
-import schemeinterpreter.lexer.token.TokenRparen;
-import schemeinterpreter.lexer.token.TokenString;
+import schemeinterpreter.lexer.Token;
+import schemeinterpreter.lexer.TokenBoolean;
+import schemeinterpreter.lexer.TokenEOF;
+import schemeinterpreter.lexer.TokenIdentifier;
+import schemeinterpreter.lexer.TokenInteger;
+import schemeinterpreter.lexer.TokenLparen;
+import schemeinterpreter.lexer.TokenQuote;
+import schemeinterpreter.lexer.TokenRparen;
+import schemeinterpreter.lexer.TokenString;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -57,6 +57,10 @@ import static schemeinterpreter.parser.ReplacementRule.S_TO_EXPRS_EOF;
  * @author nick
  */
 public class PredictTable {
+    
+    public static PredictTable makeTable() {
+        return new PredictTable();
+    }
 
     private final Map<Class<? extends Symbol>, Map<Class<? extends Token>, ReplacementRule>> table;
 
@@ -69,10 +73,6 @@ public class PredictTable {
         addListEntries();
         addListExprsEntries();
         addTerminalEntries();
-    }
-
-    public static PredictTable makeTable() {
-        return new PredictTable();
     }
 
     private void addSEntries() {

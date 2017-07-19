@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.lexer.token;
+package schemeinterpreter.lexer;
 
 /**
  *
  * @author nick
  */
-public class TokenRparen extends Token {
-
-    TokenRparen() {
-        super.setValue(")");
-    }
+public class TokenQuote extends Token {
 
     public static String repr() {
-        return ")";
+        return "'";
+    }
+    
+    TokenQuote() {
+        super.setValue("'");
     }
 
 }

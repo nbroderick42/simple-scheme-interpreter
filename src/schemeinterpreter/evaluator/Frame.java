@@ -15,6 +15,10 @@ import static schemeinterpreter.evaluator.AtomIdentifier.make;
  * @author nick
  */
 public class Frame {
+    
+    public static Frame makeGlobalFrame() {
+        return new Frame(null);
+    }
 
     private Frame parent;
 
@@ -23,10 +27,6 @@ public class Frame {
     private Frame(Frame parent) {
         this.parent = parent;
         this.table = new HashMap<>();
-    }
-
-    public static Frame makeGlobalFrame() {
-        return new Frame(null);
     }
 
     public void bind(AtomIdentifier id, Atom val) {

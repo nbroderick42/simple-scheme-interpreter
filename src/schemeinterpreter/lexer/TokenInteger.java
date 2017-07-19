@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.lexer.token;
+package schemeinterpreter.lexer;
 
 /**
  *
  * @author nick
  */
-public class TokenEOF extends Token {
-
-    TokenEOF() {
-        super.setValue("EOF");
-    }
+public class TokenInteger extends Token {
 
     public static String repr() {
-        return "[eof]";
+        return "[integer]";
+    }
+    
+    TokenInteger(String value) {
+        super.setValue(value);
     }
 
 }

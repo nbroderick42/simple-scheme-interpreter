@@ -1,4 +1,4 @@
-package schemeinterpreter.lexer.token;
+package schemeinterpreter.lexer;
 
 /**
  * The definition for the Token and its subtypes. Tokens are produced by the
@@ -9,16 +9,11 @@ package schemeinterpreter.lexer.token;
 public abstract class Token {
 
     /**
-     * The internal value for each token. Need only be set for
-     */
-    private String value;
-
-    /**
      * Static factory method that creates an LPAREN token
      *
      * @return an LPAREN Token
      */
-    public static TokenLparen makeLparen() {
+    static TokenLparen makeLparen() {
         return new TokenLparen();
     }
 
@@ -27,7 +22,7 @@ public abstract class Token {
      *
      * @return an RPAREN Token
      */
-    public static Token makeRparen() {
+    static Token makeRparen() {
         return new TokenRparen();
     }
 
@@ -36,7 +31,7 @@ public abstract class Token {
      *
      * @return a QUOTE Token
      */
-    public static TokenQuote makeQuote() {
+    static TokenQuote makeQuote() {
         return new TokenQuote();
     }
 
@@ -46,7 +41,7 @@ public abstract class Token {
      * @param value the value to set
      * @return an STRING Token
      */
-    public static TokenString makeString(String value) {
+    static TokenString makeString(String value) {
         return new TokenString(value);
     }
 
@@ -56,7 +51,7 @@ public abstract class Token {
      * @param value the value to set
      * @return an IDENTIFIER Token
      */
-    public static TokenIdentifier makeIdentifier(String value) {
+    static TokenIdentifier makeIdentifier(String value) {
         return new TokenIdentifier(value);
     }
 
@@ -66,11 +61,11 @@ public abstract class Token {
      * @param value the value to set
      * @return an INTEGER Token
      */
-    public static TokenInteger makeInteger(String value) {
+    static TokenInteger makeInteger(String value) {
         return new TokenInteger(value);
     }
 
-    public static TokenBoolean makeBoolean(String value) {
+    static TokenBoolean makeBoolean(String value) {
         return new TokenBoolean(value);
     }
 
@@ -79,9 +74,14 @@ public abstract class Token {
      *
      * @return an EOF Token
      */
-    public static TokenEOF makeEOF() {
+    static TokenEOF makeEOF() {
         return new TokenEOF();
     }
+    
+    /**
+     * The internal value for each token. Need only be set for
+     */
+    private String value;
 
     /**
      * Returns the underlying value for this token.
@@ -100,7 +100,7 @@ public abstract class Token {
     /**
      * @param value the value to set
      */
-    public void setValue(String value) {
+    void setValue(String value) {
         this.value = value;
     }
 }

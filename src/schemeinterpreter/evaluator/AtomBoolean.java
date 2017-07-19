@@ -24,6 +24,14 @@ public class AtomBoolean extends AtomImpl {
     public static AtomBoolean make(boolean bool) {
         return bool ? getTrue() : getFalse();
     }
+    
+    public static AtomBoolean getTrue() {
+        return TRUE;
+    }
+    
+    public static AtomBoolean getFalse() {
+        return FALSE;
+    }
 
     public AtomBoolean negate() {
         return isFalse() ? getTrue() : getFalse();
@@ -42,13 +50,6 @@ public class AtomBoolean extends AtomImpl {
         return this == getFalse();
     }
 
-    public static AtomBoolean getTrue() {
-        return TRUE;
-    }
-
-    public static AtomBoolean getFalse() {
-        return FALSE;
-    }
 
     @Override
     public String toString() {

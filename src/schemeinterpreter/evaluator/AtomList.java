@@ -12,37 +12,22 @@ import static java.util.stream.Collector.of;
 import static java.util.stream.Collectors.joining;
 import java.util.stream.Stream;
 import static java.util.stream.Stream.builder;
-import schemeinterpreter.evaluator.Evaluator;
 
 /**
  *
  * @author nick
  */
 public class AtomList extends AtomImpl {
+    
+    public static AtomList makeEmptyList() {
+        return new AtomList();
+    }
+    public static Collector<Atom, ?, AtomList> toAtomList() {
+        return of(AtomList::new, AtomList::append,
+                AtomList::merge, new Collector.Characteristics[]{});
+    }
 
     private Integer size;
-
-    private class Node {
-
-        private final Atom atom;
-        private Node next;
-
-        public Node(Atom atom) {
-            this.atom = atom;
-        }
-
-        private void setNext(Node next) {
-            this.next = next;
-        }
-
-        private Node getNext() {
-            return next;
-        }
-
-        private Atom getAtom() {
-            return atom;
-        }
-    }
 
     private Node first;
     private Node last;
@@ -53,10 +38,6 @@ public class AtomList extends AtomImpl {
     private AtomList(Node first, Node last) {
         this.first = first;
         this.last = last;
-    }
-
-    public static AtomList makeEmptyList() {
-        return new AtomList();
     }
 
     public void prepend(Atom atom) {
@@ -109,7 +90,7 @@ public class AtomList extends AtomImpl {
 
     @Override
     public Atom evaluate() {
-        return Evaluator.getInstance().evaluate(this);
+        return Evaluator.evaluate(this);
     }
 
     public boolean isEmpty() {
@@ -126,11 +107,6 @@ public class AtomList extends AtomImpl {
         Stream.Builder<Atom> builder = builder();
         forEach(builder::add);
         return builder.build();
-    }
-
-    public static Collector<Atom, ?, AtomList> toAtomList() {
-        return of(AtomList::new, AtomList::append,
-                AtomList::merge, new Collector.Characteristics[]{});
     }
 
     @Override
@@ -190,6 +166,28 @@ public class AtomList extends AtomImpl {
 
     public boolean allMatchType(Class<? extends Atom> type) {
         return stream().allMatch(type::isInstance);
+    }
+    
+    private class Node {
+        
+        private final Atom atom;
+        private Node next;
+        
+        public Node(Atom atom) {
+            this.atom = atom;
+        }
+        
+        private void setNext(Node next) {
+            this.next = next;
+        }
+        
+        private Node getNext() {
+            return next;
+        }
+        
+        private Atom getAtom() {
+            return atom;
+        }
     }
 
 }

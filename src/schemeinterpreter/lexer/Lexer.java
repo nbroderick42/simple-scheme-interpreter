@@ -1,6 +1,5 @@
 package schemeinterpreter.lexer;
 
-import schemeinterpreter.lexer.token.Token;
 import java.io.BufferedReader;
 import java.io.IOException;
 import static java.nio.file.Files.newBufferedReader;
@@ -25,6 +24,89 @@ public class Lexer {
      * that may begin an identifier.
      */
     private static final String EXTENDED_CHARS = "!$%&*:<=>?^_~+-'";
+    
+    /**
+     * Static factory method that returns a lexer that analyzes
+     * the file at the given path.
+     *
+     * @param pathToFile The path to the file to analyze
+     *
+     * @return A Lexer which analyzes the given file
+     *
+     * @throws java.io.IOException
+     */
+    public static Lexer scanFile(Path pathToFile) throws IOException {
+        return new Lexer(pathToFile);
+    }
+    
+    /**
+     * A convenience method that tests if a character is EOF or a
+     * newline ('\n').
+     *
+     * @param c The character to test
+     *
+     * @return True if the character is neither EOF or '\n', false otherwise
+     */
+    private static boolean isNotNewlineOrEOF(int c) {
+        return c != -1 && c != '\n';
+    }
+    /**
+     * A convenience method that tests if a character is one of the allowable
+     * "extended characters" which may begin an IDENTIFIER.
+     *
+     * @param c The character to test
+     *
+     * @return True if the character is one of the allowed characters, false
+     * otherwise.
+     */
+    private static boolean isExtendedChar(int c) {
+        return EXTENDED_CHARS.indexOf(c) != -1;
+    }
+    
+    /**
+     * A convenience method that tests if a character is permitted to be part
+     * of a STRING token. A character qualifies if is not a newline (tokens
+     * cannot span multiple lines), EOF, or a quotation mark (as this
+     * marks the end of the STRING).
+     *
+     * @param c The character to test
+     *
+     * @return True if the character may belong to a STRING, false otherwise.
+     */
+    private static boolean isStringChar(int c) {
+        return isNotNewlineOrEOF(c) && c != '"';
+    }
+    
+    /**
+     * A convenience method that tests if a character is permitted to be part
+     * of an IDENTIFIER token. A character qualifies if
+     * <ul>
+     * <li>is neither EOF or '\n' (tokens cannot span multiple lines), and</li>
+     * <li>is one of the permitted extended characters, a letter or a digit</li>
+     * </ul>
+     *
+     * @param c The character to test
+     *
+     * @return True if the character may belong to an IDENTIFIER, false otherwise.
+     */
+    private static boolean isIdentifierChar(int c) {
+        return isNotNewlineOrEOF(c)
+                && (isExtendedChar(c)
+                || Character.isLetter(c)
+                || Character.isDigit(c));
+    }
+    
+    /**
+     * A convenience method that tests if a character is permitted to be part
+     * of an INTEGER token. A character qualifies if is a digit.
+     *
+     * @param c The character to test
+     *
+     * @return True if the character may belong to an IDENTIFIER, false otherwise.
+     */
+    private static boolean isIntegerChar(int c) {
+        return Character.isDigit(c);
+    }
 
     /**
      * The reader for the input file.
@@ -57,29 +139,6 @@ public class Lexer {
         scanNextChar();
     }
 
-    /**
-     * Static factory method that returns a lexer that analyzes
-     * the file at the given path.
-     *
-     * @param pathToFile The path to the file to analyze
-     *
-     * @return A Lexer which analyzes the given file
-     *
-     * @throws java.io.IOException
-     */
-    public static Lexer scanFile(Path pathToFile) throws IOException {
-        return new Lexer(pathToFile);
-    }
-
-    /**
-     * Advances the lexer and returns the next available token from
-     * the input file. Will return an instance of Token.EOF if invoked when
-     * no more tokens are available.
-     *
-     *
-     * @return The next available token in the file, including possibly EOF if
-     * no more tokens can be produced from the file being analyzed.
-     */
     /**
      * Returns the most recently produced Token from the input file. If invoked
      * before the first Token is produced, this method will cause the first
@@ -290,74 +349,5 @@ public class Lexer {
         return sb.toString();
     }
 
-    /**
-     * A convenience method that tests if a character is EOF or a
-     * newline ('\n').
-     *
-     * @param c The character to test
-     *
-     * @return True if the character is neither EOF or '\n', false otherwise
-     */
-    private static boolean isNotNewlineOrEOF(int c) {
-        return c != -1 && c != '\n';
-    }
-
-    /**
-     * A convenience method that tests if a character is one of the allowable
-     * "extended characters" which may begin an IDENTIFIER.
-     *
-     * @param c The character to test
-     *
-     * @return True if the character is one of the allowed characters, false
-     * otherwise.
-     */
-    private static boolean isExtendedChar(int c) {
-        return EXTENDED_CHARS.indexOf(c) != -1;
-    }
-
-    /**
-     * A convenience method that tests if a character is permitted to be part
-     * of a STRING token. A character qualifies if is not a newline (tokens
-     * cannot span multiple lines), EOF, or a quotation mark (as this
-     * marks the end of the STRING).
-     *
-     * @param c The character to test
-     *
-     * @return True if the character may belong to a STRING, false otherwise.
-     */
-    private static boolean isStringChar(int c) {
-        return isNotNewlineOrEOF(c) && c != '"';
-    }
-
-    /**
-     * A convenience method that tests if a character is permitted to be part
-     * of an IDENTIFIER token. A character qualifies if
-     * <ul>
-     * <li>is neither EOF or '\n' (tokens cannot span multiple lines), and</li>
-     * <li>is one of the permitted extended characters, a letter or a digit</li>
-     * </ul>
-     *
-     * @param c The character to test
-     *
-     * @return True if the character may belong to an IDENTIFIER, false otherwise.
-     */
-    private static boolean isIdentifierChar(int c) {
-        return isNotNewlineOrEOF(c)
-                && (isExtendedChar(c)
-                || Character.isLetter(c)
-                || Character.isDigit(c));
-    }
-
-    /**
-     * A convenience method that tests if a character is permitted to be part
-     * of an INTEGER token. A character qualifies if is a digit.
-     *
-     * @param c The character to test
-     *
-     * @return True if the character may belong to an IDENTIFIER, false otherwise.
-     */
-    private static boolean isIntegerChar(int c) {
-        return Character.isDigit(c);
-    }
 
 }

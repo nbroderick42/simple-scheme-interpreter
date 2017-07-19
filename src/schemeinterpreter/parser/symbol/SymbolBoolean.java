@@ -5,7 +5,7 @@
  */
 package schemeinterpreter.parser.symbol;
 
-import schemeinterpreter.lexer.token.Token;
+import schemeinterpreter.lexer.Token;
 
 /**
  *

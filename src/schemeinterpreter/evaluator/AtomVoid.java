@@ -13,13 +13,12 @@ public class AtomVoid extends AtomImpl {
 
     private static final AtomVoid INSTANCE = new AtomVoid();
 
-    @Override
-    public Atom evaluate() {
-        return Evaluator.getInstance().evaluate(this);
-    }
-
     public static AtomVoid getInstance() {
         return INSTANCE;
+    }
+    @Override
+    public Atom evaluate() {
+        return Evaluator.evaluate(this);
     }
 
     @Override

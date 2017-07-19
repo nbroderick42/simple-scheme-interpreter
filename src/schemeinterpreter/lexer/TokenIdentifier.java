@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.lexer.token;
+package schemeinterpreter.lexer;
 
 /**
  *
@@ -11,12 +11,12 @@ package schemeinterpreter.lexer.token;
  */
 public class TokenIdentifier extends Token {
 
-    TokenIdentifier(String value) {
-        super.setValue(value);
-    }
-
     public static String repr() {
         return "[identifier]";
+    }
+    
+    TokenIdentifier(String value) {
+        super.setValue(value);
     }
 
 }

@@ -2,13 +2,17 @@ package schemeinterpreter.parser.symbol;
 
 import java.util.function.Consumer;
 import schemeinterpreter.evaluator.AtomImpl;
-import schemeinterpreter.lexer.token.Token;
+import schemeinterpreter.lexer.Token;
 
 /**
  *
  * @author nick
  */
 public abstract class Symbol {
+    
+    public static Symbol makeStartSymbol() {
+        return new SymbolS();
+    }
 
     private Symbol nextSibling, firstChild, lastChild;
 
@@ -47,10 +51,6 @@ public abstract class Symbol {
         for (Symbol curr = getFirstChild(); curr != null; curr = curr.getNextSibling()) {
             consumer.accept(curr);
         }
-    }
-
-    public static Symbol makeStartSymbol() {
-        return new SymbolS();
     }
 
     public void acceptToken(Token token) {

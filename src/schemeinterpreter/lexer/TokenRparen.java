@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.lexer.token;
+package schemeinterpreter.lexer;
 
 /**
  *
  * @author nick
  */
-public class TokenBoolean extends Token {
-
-    TokenBoolean(String value) {
-        super.setValue(value);
-    }
+public class TokenRparen extends Token {
 
     public static String repr() {
-        return "[boolean]";
+        return ")";
+    }
+    
+    TokenRparen() {
+        super.setValue(")");
     }
 
 }

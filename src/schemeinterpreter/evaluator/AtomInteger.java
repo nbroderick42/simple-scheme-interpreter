@@ -6,7 +6,6 @@
 package schemeinterpreter.evaluator;
 
 import java.util.Objects;
-import schemeinterpreter.evaluator.Evaluator;
 import schemeinterpreter.parser.symbol.SymbolInteger;
 
 /**
@@ -15,7 +14,6 @@ import schemeinterpreter.parser.symbol.SymbolInteger;
  */
 public class AtomInteger extends AtomImpl {
 
-    private final Integer val;
 
     public static AtomInteger make(SymbolInteger integer) {
         return new AtomInteger(integer.getValue());
@@ -24,6 +22,8 @@ public class AtomInteger extends AtomImpl {
     public static AtomInteger make(Integer integer) {
         return new AtomInteger(integer);
     }
+    
+    private final Integer val;
 
     private AtomInteger(Integer val) {
         this.val = val;

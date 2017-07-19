@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import schemeinterpreter.lexer.Lexer;
-import schemeinterpreter.lexer.token.Token;
+import schemeinterpreter.lexer.Token;
 import static schemeinterpreter.parser.PredictTable.makeTable;
 import static schemeinterpreter.parser.symbol.Symbol.makeStartSymbol;
 
