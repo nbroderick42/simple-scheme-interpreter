@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import static schemeinterpreter.evaluator.AtomLambda.evaluateListAndTakeLast;
 import static schemeinterpreter.evaluator.Evaluator.assertTrue;
 import static schemeinterpreter.evaluator.Atom.assertIsBoolean;
 import static schemeinterpreter.evaluator.AtomList.toAtomList;
@@ -218,7 +217,7 @@ public enum BuiltinProcedure implements AtomProcedure {
                 valMap.entrySet().stream().forEach(scope::bind);
                 AtomList exprs = args.getTail();
 
-                return evaluateListAndTakeLast(exprs);
+                return Evaluator.evaluateListAndTakeLast(exprs);
             };
 
             return Evaluator.evaluateInLocalScope(impl);
@@ -257,7 +256,7 @@ public enum BuiltinProcedure implements AtomProcedure {
 
                 AtomList exprs = args.getTail();
 
-                return evaluateListAndTakeLast(exprs);
+                return Evaluator.evaluateListAndTakeLast(exprs);
 
             };
 
@@ -361,7 +360,7 @@ public enum BuiltinProcedure implements AtomProcedure {
         public AtomImpl apply(AtomList args) {
             assertTrue(args.size() == 1, "not takes exactly one argument");
 
-            Atom firstArg = args.getHead();
+            Atom firstArg = args.getHead().evaluate();
             assertIsBoolean(firstArg);
             AtomBoolean val = (AtomBoolean) firstArg;
 
@@ -497,7 +496,7 @@ public enum BuiltinProcedure implements AtomProcedure {
             AtomList exprs = args.getTail().getTail();
 
             try {
-                return evaluateListAndTakeLast(exprs);
+                return Evaluator.evaluateListAndTakeLast(exprs);
             }
             catch (SchemeException se) {
                 Function<Frame, Atom> handleExc = scope -> {
@@ -561,17 +560,14 @@ public enum BuiltinProcedure implements AtomProcedure {
     {
         assertTrue(args.size() == 2, "integer comparison operation takes exactly two arguments");
 
-        Atom firstArg = args.getHead();
-        Atom secondArg = args.getTail().getHead();
+        Atom firstArg = args.getHead().evaluate();
+        Atom secondArg = args.getTail().getHead().evaluate();
 
-        Atom firstEval = firstArg.evaluate();
-        Atom secondEval = secondArg.evaluate();
+        assertTrue(firstArg.isInteger(), "integer comparison requires two integers");
+        assertTrue(secondArg.isInteger(), "integer comparison requires two integers");
 
-        assertTrue(firstEval.isInteger(), "integer comparison requires two integers");
-        assertTrue(secondEval.isInteger(), "integer comparison requires two integers");
-
-        AtomInteger firstInt = (AtomInteger) firstEval;
-        AtomInteger secondInt = (AtomInteger) secondEval;
+        AtomInteger firstInt = (AtomInteger) firstArg;
+        AtomInteger secondInt = (AtomInteger) secondArg;
 
         return op.test(firstInt, secondInt) ? AtomBoolean.getTrue() : AtomBoolean.getFalse();
     }

@@ -130,6 +130,16 @@ public class Evaluator {
         
         return pair.getTail().getHead().evaluate();
     }
+    
+    static Atom evaluateListAndTakeLast(AtomList exprs) {
+        return exprs.stream()
+                .map(Atom::evaluate)
+                .reduce(AtomVoid.getInstance(), Evaluator::takeLast);
+    }
+  
+    private static Atom takeLast(Atom first, Atom second) {
+        return second;
+    }
 
     public static void assertTrue(boolean test, String message) {
         if (!test) {

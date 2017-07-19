@@ -7,25 +7,16 @@ package schemeinterpreter.evaluator;
 
 import java.util.function.Function;
 import static schemeinterpreter.evaluator.Evaluator.evaluateInScope;
+import static schemeinterpreter.evaluator.Evaluator.evaluateListAndTakeLast;
 
 /**
  *
  * @author nick
  */
 public class AtomLambda extends AtomImpl implements AtomProcedure {
-    
+
     public static AtomLambda make(Frame closingFrame, AtomList params, AtomList exprs) {
         return new AtomLambda(closingFrame, params, exprs);
-    }
-    
-    public static Atom evaluateListAndTakeLast(AtomList exprs) {
-        return exprs.stream()
-                .map((atom) -> atom.evaluate())
-                .reduce(AtomVoid.getInstance(), AtomLambda::takeLast);
-    }
-    
-    private static Atom takeLast(Atom first, Atom second) {
-        return second;
     }
 
     private Frame closingFrame;
