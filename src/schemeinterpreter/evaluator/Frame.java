@@ -5,10 +5,9 @@
  */
 package schemeinterpreter.evaluator;
 
-import static java.util.Collections.unmodifiableMap;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static schemeinterpreter.evaluator.AtomIdentifier.make;
 
 /**
  *
@@ -34,7 +33,7 @@ public class Frame {
     }
 
     public void bind(String identifier, Atom val) {
-        table.put(make(identifier), val);
+        table.put(AtomIdentifier.make(identifier), val);
     }
 
     public void bind(Map.Entry<AtomIdentifier, Atom> entry) {
@@ -47,7 +46,7 @@ public class Frame {
                 return curr.getTable().get(id);
             }
         }
-        return null;
+        throw new SchemeEvaluationError("`" + id + "' is not bound");
     }
 
     public boolean isBound(AtomIdentifier id) {
@@ -59,7 +58,7 @@ public class Frame {
     }
 
     private Map<AtomIdentifier, Atom> getTable() {
-        return unmodifiableMap(table);
+        return Collections.unmodifiableMap(table);
     }
 
     public Frame attachNewFrame() {

@@ -1,7 +1,7 @@
-package schemeinterpreter.parser.symbol;
+package schemeinterpreter.parser;
 
 import java.util.function.Consumer;
-import schemeinterpreter.evaluator.AtomImpl;
+import schemeinterpreter.evaluator.Atom;
 import schemeinterpreter.lexer.Token;
 
 /**
@@ -10,7 +10,7 @@ import schemeinterpreter.lexer.Token;
  */
 public abstract class Symbol {
     
-    public static Symbol makeStartSymbol() {
+    static Symbol makeStartSymbol() {
         return new SymbolS();
     }
 
@@ -18,13 +18,13 @@ public abstract class Symbol {
 
     private boolean terminal;
 
-    private AtomImpl eval;
+    private Atom eval;
 
     protected Symbol() {
         this.terminal = false;
     }
 
-    public void addChild(Symbol s) {
+    void addChild(Symbol s) {
         if (firstChild == null) {
             firstChild = s;
         }
@@ -35,52 +35,53 @@ public abstract class Symbol {
         lastChild = s;
     }
 
-    public void setNextSibling(Symbol nextSibling) {
+    void setNextSibling(Symbol nextSibling) {
         this.nextSibling = nextSibling;
     }
 
-    public Symbol getFirstChild() {
+    Symbol getFirstChild() {
         return firstChild;
     }
 
-    public Symbol getNextSibling() {
+    Symbol getNextSibling() {
         return nextSibling;
     }
 
-    public void forEachChild(Consumer<Symbol> consumer) {
+    void forEachChild(Consumer<Symbol> consumer) {
         for (Symbol curr = getFirstChild(); curr != null; curr = curr.getNextSibling()) {
             consumer.accept(curr);
         }
     }
 
-    public void acceptToken(Token token) {
+    void acceptToken(Token token) {
     }
 
-    public boolean isTerminal() {
+    boolean isTerminal() {
         return terminal;
     }
 
-    public String toFormattedString() {
+    String toFormattedString() {
         return toString();
     }
 
-    /**
-     * @param terminal the terminal to set
-     */
-    public void setTerminal(boolean terminal) {
+    void setTerminal(boolean terminal) {
         this.terminal = terminal;
     }
 
-    public AtomImpl getEval() {
+    public Atom getEval() {
         return eval;
     }
 
-    public void setEval(AtomImpl eval) {
+    void setEval(Atom eval) {
         this.eval = eval;
     }
-
-    public boolean isEOF() {
-        return this instanceof SymbolEOF;
+    
+    boolean isTopLevelNewline() {
+        return this instanceof SymbolTopLevelNewline;
+    }
+    
+    boolean isNewline() {
+        return this instanceof SymbolNewline;
     }
 
 }

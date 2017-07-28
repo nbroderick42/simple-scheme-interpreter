@@ -11,17 +11,17 @@ package schemeinterpreter.evaluator;
  */
 public class SchemeException extends RuntimeException {
 
-    private final Atom value;
-
+    private final Atom raisedValue;
+    
     /**
      * Creates a new instance of <code>SchemeException</code> without detail message.
      */
-    public SchemeException(Atom value) {
-        super("Uncaught exception raised with value " + value);
-        this.value = value;
+    public SchemeException(Atom raisedValue) {
+        super("Uncaught exception raised with value " + raisedValue);
+        this.raisedValue = raisedValue;
     }
-
-    public Atom getValue() {
-        return value;
+    
+    public Atom getRaisedValue() {
+        return raisedValue;
     }
 }

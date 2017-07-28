@@ -6,7 +6,7 @@
 package schemeinterpreter.evaluator;
 
 import java.util.Objects;
-import schemeinterpreter.parser.symbol.SymbolBoolean;
+import schemeinterpreter.parser.SymbolBoolean;
 
 /**
  *

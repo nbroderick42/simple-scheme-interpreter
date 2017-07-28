@@ -13,6 +13,8 @@ import static schemeinterpreter.evaluator.Evaluator.assertTrue;
  */
 public interface Atom {
 
+    void setLazy(boolean lazy);
+    
     boolean isLazy();
 
     Atom evaluate();
@@ -41,7 +43,7 @@ public interface Atom {
         return this instanceof AtomList;
     }
 
-    default boolean isOperation() {
+    default boolean isProcedure() {
         return this instanceof AtomProcedure;
     }
 

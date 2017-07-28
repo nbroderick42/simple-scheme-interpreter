@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import static schemeinterpreter.evaluator.Evaluator.assertTrue;
 import static schemeinterpreter.evaluator.Atom.assertIsBoolean;
@@ -25,7 +24,14 @@ public enum BuiltinProcedure implements AtomProcedure {
 
         @Override
         public Atom apply(AtomList args) {
-            return applyArithmeticOperation(args, Math::addExact, 0);
+            Integer result = args.stream()
+                    .map(Atom::evaluate)
+                    .peek(Atom::assertIsInteger)
+                    .map(AtomInteger.class::cast)
+                    .map(AtomInteger::getValue)
+                    .reduce(0, Math::addExact);
+            
+            return AtomInteger.make(result);
         }
 
         @Override
@@ -38,7 +44,14 @@ public enum BuiltinProcedure implements AtomProcedure {
 
         @Override
         public Atom apply(AtomList args) {
-            return applyArithmeticOperation(args, Math::subtractExact, 0);
+            Integer result = args.stream()
+                    .map(Atom::evaluate)
+                    .peek(Atom::assertIsInteger)
+                    .map(AtomInteger.class::cast)
+                    .map(AtomInteger::getValue)
+                    .reduce(0, Math::subtractExact);
+            
+            return AtomInteger.make(result);
         }
 
         @Override
@@ -51,7 +64,14 @@ public enum BuiltinProcedure implements AtomProcedure {
 
         @Override
         public Atom apply(AtomList args) {
-            return applyArithmeticOperation(args, Math::multiplyExact, 1);
+            Integer result = args.stream()
+                    .map(Atom::evaluate)
+                    .peek(Atom::assertIsInteger)
+                    .map(AtomInteger.class::cast)
+                    .map(AtomInteger::getValue)
+                    .reduce(1, Math::multiplyExact);
+            
+            return AtomInteger.make(result);
         }
 
         @Override
@@ -63,12 +83,31 @@ public enum BuiltinProcedure implements AtomProcedure {
     DIVIDE("/") {
 
         @Override
-        public Atom apply(AtomList args) {
+        public Atom apply(AtomList args) throws SchemeEvaluationError {
+            if (args.isEmpty()) {
+                return AtomInteger.make(1);
+            }
+            else if (args.getTail().isEmpty()) {
+                
+            }
+            
+            Atom firstArg = args.getHead().evaluate();
+            assertTrue(firstArg.isInteger(), "expected integer result");
+            AtomInteger seed = (AtomInteger) firstArg;
+            
             try {
-                return applyArithmeticOperation(args, Math::floorDiv, 1);
+                Integer result = args.stream()
+                    .map(Atom::evaluate)
+                    .peek(Atom::assertIsInteger)
+                    .map(AtomInteger.class::cast)
+                    .map(AtomInteger::getValue)
+                    .skip(1)
+                    .reduce(seed.getValue(), Math::floorDiv);
+            
+            return AtomInteger.make(result);
             }
             catch (ArithmeticException ae) {
-                throw new EvaluationException("division by zero");
+                throw new SchemeEvaluationError("division by zero");
             }
         }
 
@@ -185,7 +224,7 @@ public enum BuiltinProcedure implements AtomProcedure {
     LET("let") {
 
         @Override
-        public Atom apply(AtomList args) {
+        public Atom apply(AtomList args) throws SchemeEvaluationError {
             Function<Frame, Atom> impl = scope -> {
 
                 assertTrue(args.size() >= 1, "let takes at least one argument");
@@ -206,7 +245,7 @@ public enum BuiltinProcedure implements AtomProcedure {
                     AtomIdentifier id = (AtomIdentifier) firstElem;
 
                     if (valMap.containsKey(id)) {
-                        throw new EvaluationException("cannot bind to already bound identifier `" + id + "'");
+                        throw new SchemeEvaluationError("cannot bind to already bound identifier `" + id + "'");
                     }
                     else {
                         Atom val = pair.getTail().getHead().evaluate();
@@ -230,7 +269,7 @@ public enum BuiltinProcedure implements AtomProcedure {
 
     },
     LET_STAR("let*") {
-        //TODO: assertions here
+        
         @Override
         public Atom apply(AtomList args) {
             Function<Frame, Atom> impl = scope -> {
@@ -281,10 +320,11 @@ public enum BuiltinProcedure implements AtomProcedure {
 
             assertTrue(Evaluator.isBound(id), "identifier must be bound to a value");
 
-            Atom prevValue = Evaluator.resolve(id);
+            Atom prevValue = id.evaluate();
 
             Atom secondArg = args.getTail().getHead();
             Atom nextValue = secondArg.evaluate();
+            
             Evaluator.bindToCurrentFrame(id, nextValue);
 
             return prevValue;
@@ -468,7 +508,7 @@ public enum BuiltinProcedure implements AtomProcedure {
     RAISE("raise") {
 
         @Override
-        public Atom apply(AtomList args) {
+        public Atom apply(AtomList args) throws SchemeException {
             assertTrue(args.size() == 1, "raise takes exactly one argument");
             Atom firstArg = args.getHead();
 
@@ -479,7 +519,7 @@ public enum BuiltinProcedure implements AtomProcedure {
     GUARD("guard") {
 
         @Override
-        public Atom apply(AtomList args) {
+        public Atom apply(AtomList args) throws SchemeException {
             assertTrue(args.size() >= 3, "guard takes at least 3 arguments");
 
             Atom firstArg = args.getHead();
@@ -499,8 +539,9 @@ public enum BuiltinProcedure implements AtomProcedure {
                 return Evaluator.evaluateListAndTakeLast(exprs);
             }
             catch (SchemeException se) {
-                Function<Frame, Atom> handleExc = scope -> {
-                    scope.bind(exv, se.getValue());
+                Function<Frame, Atom> handleExc = scope -> 
+                {
+                    scope.bind(exv, se.getRaisedValue());
                     
                     return handlers.stream()
                             .filter(Evaluator::isConditionTrue)
@@ -531,27 +572,15 @@ public enum BuiltinProcedure implements AtomProcedure {
     public boolean isLazy() {
         return lazy;
     }
+    
+    @Override
+    public void setLazy(boolean lazy) {
+        this.lazy = lazy;
+    }
 
     @Override
     public Atom evaluate() {
         return Evaluator.evaluate(this);
-    }
-
-    private static AtomInteger applyArithmeticOperation(
-            AtomList args,
-            BinaryOperator<Integer> op,
-            Integer identity) 
-    {
-        
-        Integer result = args.stream()
-                .map(Atom::evaluate)
-                .peek(Atom::assertIsInteger)
-                .map(AtomInteger.class::cast)
-                .map(AtomInteger::getValue)
-                .reduce(op)
-                .orElse(identity);
-
-        return AtomInteger.make(result);
     }
 
     private static AtomBoolean applyArithmeticComparisonOperation(

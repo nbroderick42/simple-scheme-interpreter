@@ -16,6 +16,10 @@ public abstract class Token {
     static TokenLparen makeLparen() {
         return new TokenLparen();
     }
+    
+    static TokenNewline makeNewline() {
+        return new TokenNewline();
+    }
 
     /**
      * Static factory method that creates an RPAREN token
@@ -102,5 +106,9 @@ public abstract class Token {
      */
     void setValue(String value) {
         this.value = value;
+    }
+    
+    boolean isNewline() {
+        return this instanceof TokenNewline;
     }
 }

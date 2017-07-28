@@ -3,12 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.parser.symbol;
+package schemeinterpreter.parser;
+
+import schemeinterpreter.lexer.Lexer;
 
 /**
  *
  * @author nick
  */
-public class SymbolList extends Symbol {
+public class ReplParser extends Parser {
+
+    ReplParser(Lexer lexer) {
+        super(lexer, PredictTable.makeReplPredictTable());
+    }
 
 }

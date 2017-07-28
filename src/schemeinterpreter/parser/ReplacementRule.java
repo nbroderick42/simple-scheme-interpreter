@@ -1,18 +1,5 @@
 package schemeinterpreter.parser;
 
-import schemeinterpreter.parser.symbol.SymbolString;
-import schemeinterpreter.parser.symbol.SymbolQuote;
-import schemeinterpreter.parser.symbol.SymbolListExprs;
-import schemeinterpreter.parser.symbol.SymbolExprs;
-import schemeinterpreter.parser.symbol.SymbolLparen;
-import schemeinterpreter.parser.symbol.SymbolRparen;
-import schemeinterpreter.parser.symbol.SymbolIdentifier;
-import schemeinterpreter.parser.symbol.SymbolList;
-import schemeinterpreter.parser.symbol.SymbolExpr;
-import schemeinterpreter.parser.symbol.SymbolEOF;
-import schemeinterpreter.parser.symbol.Symbol;
-import schemeinterpreter.parser.symbol.SymbolBoolean;
-import schemeinterpreter.parser.symbol.SymbolInteger;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -51,6 +38,26 @@ public enum ReplacementRule {
         }
 
     },
+    S_TO_TOPLEVELEXPRS_TOPLEVELNL {
+
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser)
+                throws IOException,
+                InstantiationException, IllegalAccessException,
+                NoSuchMethodException, InvocationTargetException 
+        {
+            SymbolTopLevelExprs topLevelExprs = new SymbolTopLevelExprs();
+            SymbolTopLevelNewline topLevelNewline = new SymbolTopLevelNewline();
+
+            parser.parse(topLevelExprs);
+            parser.parse(topLevelNewline);
+
+            parent.setEval(topLevelExprs.getEval());
+
+            return asList(topLevelExprs, topLevelNewline);
+        }
+
+    },
     EXPRS_TO_EPSILON {
 
         @Override
@@ -66,7 +73,8 @@ public enum ReplacementRule {
         public List<Symbol> apply(Symbol parent, Parser parser)
                 throws IOException,
                 InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
+                NoSuchMethodException, InvocationTargetException 
+        {
             SymbolExpr expr = new SymbolExpr();
             SymbolExprs exprs = new SymbolExprs();
 
@@ -79,6 +87,63 @@ public enum ReplacementRule {
             parent.setEval(exprs.getEval());
 
             return asList(expr, exprs);
+        }
+
+    },
+    TOPLEVELEXPRS_TO_EXPR_TOPLEVELEXPRS {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) throws IOException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            SymbolExpr expr = new SymbolExpr();
+            SymbolTopLevelExprs topLevelExprs = new SymbolTopLevelExprs();
+
+            parser.parse(expr);
+            parser.parse(topLevelExprs);
+
+            AtomList exprs1Eval = (AtomList) topLevelExprs.getEval();
+            exprs1Eval.prepend(expr.getEval());
+
+            parent.setEval(topLevelExprs.getEval());
+
+            return asList(expr, topLevelExprs);
+        }
+    
+    },
+    EXPR_TO_NEWLINE_EXPR {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, InstantiationException, IllegalAccessException, 
+                NoSuchMethodException, InvocationTargetException
+        {
+            SymbolNewline nl = new SymbolNewline();
+            SymbolExpr expr = new SymbolExpr();
+            
+            parser.parse(nl);
+            parser.parse(expr);
+            
+            parent.setEval(expr.getEval());
+            
+            return asList(nl, expr);
+        }
+
+    },
+    EXPRS_TO_NEWLINE_EXPRS {
+        
+        @Override
+        public List<Symbol> apply(Symbol parent, Parser parser) 
+                throws IOException, InstantiationException, IllegalAccessException, 
+                NoSuchMethodException, InvocationTargetException
+        {
+            SymbolNewline nl = new SymbolNewline();
+            SymbolExprs exprs = new SymbolExprs();
+            
+            parser.parse(nl);
+            parser.parse(exprs);
+            
+            parent.setEval(exprs.getEval());
+            
+            return asList(nl, exprs);
         }
 
     },
@@ -182,7 +247,7 @@ public enum ReplacementRule {
         }
 
     },
-    LIST_TO_LPAREN_LISTEXPRS_RPAREN {
+    LIST_TO_LPAREN_EXPRS_RPAREN {
 
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser)
@@ -190,36 +255,20 @@ public enum ReplacementRule {
                 InstantiationException, IllegalAccessException,
                 NoSuchMethodException, InvocationTargetException {
             SymbolLparen lparen = new SymbolLparen();
-            SymbolListExprs listExprs = new SymbolListExprs();
+            SymbolExprs exprs = new SymbolExprs();
             SymbolRparen rparen = new SymbolRparen();
 
             parser.parse(lparen);
-            parser.parse(listExprs);
-            parser.parse(rparen);
-
-            parent.setEval(listExprs.getEval());
-
-            return asList(lparen, listExprs, rparen);
-        }
-
-    },
-    LISTEXPR_TO_EXPRS {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            SymbolExprs exprs = new SymbolExprs();
             parser.parse(exprs);
+            parser.parse(rparen);
 
             parent.setEval(exprs.getEval());
 
-            return asList(exprs);
+            return asList(lparen, exprs, rparen);
         }
 
     },
-    LPAREN_TO_EPSILON {
+    TERMINAL_TO_EPSILON {
 
         @Override
         public List<Symbol> apply(Symbol parent, Parser parser)
@@ -229,84 +278,7 @@ public enum ReplacementRule {
             return asList();
         }
 
-    },
-    RPAREN_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    QUOTE_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    IDENTIFIER_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    INTEGER_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    STRING_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    BOOLEAN_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    },
-    EOF_TO_EPSILON {
-
-        @Override
-        public List<Symbol> apply(Symbol parent, Parser parser)
-                throws IOException,
-                InstantiationException, IllegalAccessException,
-                NoSuchMethodException, InvocationTargetException {
-            return asList();
-        }
-
-    };
+    };    
 
     public abstract List<Symbol> apply(Symbol parent, Parser parser)
             throws IOException,

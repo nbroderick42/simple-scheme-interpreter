@@ -3,14 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator;
+package schemeinterpreter.lexer;
 
 /**
  *
  * @author nick
  */
-public interface AtomProcedure extends Atom {
-
-    public Atom apply(AtomList args) throws SchemeEvaluationError, SchemeException;
-
+public class TokenNewline extends Token {
+    
+    public static String repr() {
+        return "[newline]";
+    }
+    
+    TokenNewline() {
+        super.setValue("\n");
+    }
+    
 }

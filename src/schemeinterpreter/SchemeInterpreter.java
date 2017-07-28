@@ -5,16 +5,15 @@
  */
 package schemeinterpreter;
 
-import java.nio.file.Path;
-import static java.nio.file.Paths.get;
-import schemeinterpreter.evaluator.EvaluationException;
+import java.io.File;
+import java.io.IOException;
 import schemeinterpreter.evaluator.Evaluator;
-import schemeinterpreter.lexer.Lexer;
-import static schemeinterpreter.lexer.Lexer.scanFile;
-import schemeinterpreter.parser.AbstractSyntaxTree;
-import static schemeinterpreter.parser.AbstractSyntaxTree.buildTree;
+import schemeinterpreter.evaluator.SchemeEvaluationError;
+
 import schemeinterpreter.parser.Parser;
-import static schemeinterpreter.parser.Parser.fromLexer;
+import schemeinterpreter.parser.SchemeFatalError;
+import schemeinterpreter.parser.SchemeSyntaxError;
+import schemeinterpreter.parser.Symbol;
 
 /**
  *
@@ -22,28 +21,50 @@ import static schemeinterpreter.parser.Parser.fromLexer;
  */
 public class SchemeInterpreter {
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 1) {
-            printUsage();
-            System.exit(1);
-        }
-
-        Path pathToFile = get(args[0]);
-        Lexer lexer = scanFile(pathToFile);
-        Parser parser = fromLexer(lexer);
-
+    public static void main(String[] args) throws IOException {
         try {
-            AbstractSyntaxTree ast = buildTree(parser);
-            Evaluator.evaluate(ast);
+            switch (args.length) {
+                case 0: 
+                    beginRepl();
+                    break;
+                case 1:
+                    beginFileEval(args[0]);
+                    break;
+                default:
+                    printUsage();
+            }
         }
-        catch (EvaluationException re) {
-            System.out.println(re.getMessage());
+        catch (SchemeFatalError ex) {
+            System.out.println(ex.getMessage());
         }
+    }
 
+    private static void beginRepl() throws IOException {
+        Parser parser = Parser.fromStdin();
+        
+        while (true) {
+            try {
+                Symbol astRoot = parser.parse();
+                Evaluator.evaluate(astRoot);
+            }
+            catch (SchemeEvaluationError ex) {
+                System.out.println(ex.getMessage());
+            }
+            catch (SchemeSyntaxError ex) {
+                parser.reset();
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    private static void beginFileEval(String inputFilePath) throws IOException {
+        Parser parser = Parser.fromFile(new File(inputFilePath));
+        Symbol astRoot = parser.parse();
+        Evaluator.evaluate(astRoot);
     }
 
     private static void printUsage() {
-        System.out.println("Must supply filename of Scheme code to parse");
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

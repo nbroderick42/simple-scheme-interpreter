@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.parser.symbol;
+package schemeinterpreter.parser;
 
 import schemeinterpreter.lexer.Token;
 
@@ -11,30 +11,30 @@ import schemeinterpreter.lexer.Token;
  *
  * @author nick
  */
-public class SymbolString extends Symbol {
+public class SymbolInteger extends Symbol {
 
-    private String value;
+    private Integer value;
 
-    public SymbolString() {
+    public SymbolInteger() {
         super.setTerminal(true);
     }
 
     @Override
     public void acceptToken(Token token) {
-        this.value = token.getValue();
+        this.value = Integer.valueOf(token.getValue());
     }
 
     @Override
     public String toString() {
-        return value;
+        return value.toString();
     }
 
     @Override
     public String toFormattedString() {
-        return String.format("String: [%s]", value);
+        return String.format("Integer: [%d]", value);
     }
 
-    public String getValue() {
+    public Integer getValue() {
         return value;
     }
 

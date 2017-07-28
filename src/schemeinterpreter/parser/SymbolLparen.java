@@ -3,21 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.parser.symbol;
+package schemeinterpreter.parser;
 
 /**
  *
  * @author nick
  */
-public class SymbolRparen extends Symbol {
+public class SymbolLparen extends Symbol {
 
-    public SymbolRparen() {
+    public SymbolLparen() {
         super.setTerminal(true);
     }
 
     @Override
     public String toString() {
-        return ")";
+        return "(";
     }
 
 }

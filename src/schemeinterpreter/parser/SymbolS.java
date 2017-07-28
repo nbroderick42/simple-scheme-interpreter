@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.parser.symbol;
+package schemeinterpreter.parser;
 
 /**
  *
  * @author nick
  */
-public class SymbolListExprs extends Symbol {
+public class SymbolS extends Symbol {
 
 }

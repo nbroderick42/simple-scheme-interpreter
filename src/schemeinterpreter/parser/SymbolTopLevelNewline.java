@@ -3,24 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator;
+package schemeinterpreter.parser;
 
 /**
  *
  * @author nick
  */
-public abstract class AtomImpl implements Atom {
+public class SymbolTopLevelNewline extends Symbol {
 
-    private boolean lazy;
-
-    @Override
-    public boolean isLazy() {
-        return lazy;
+    public SymbolTopLevelNewline() {
+        super.setTerminal(true);
     }
     
     @Override
-    public void setLazy(boolean lazy) {
-        this.lazy = lazy;
+    public String toString() {
+        return "[toplevelnewline]";
     }
-
+    
 }

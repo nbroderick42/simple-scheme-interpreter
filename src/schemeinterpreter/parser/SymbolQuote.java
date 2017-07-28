@@ -3,14 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package schemeinterpreter.evaluator;
+package schemeinterpreter.parser;
 
 /**
  *
  * @author nick
  */
-public interface AtomProcedure extends Atom {
+public class SymbolQuote extends Symbol {
 
-    public Atom apply(AtomList args) throws SchemeEvaluationError, SchemeException;
+    public SymbolQuote() {
+        super.setTerminal(true);
+    }
+
+    @Override
+    public String toString() {
+        return "'";
+    }
 
 }
